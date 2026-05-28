@@ -1,4 +1,11 @@
-export default function Home() {
+import { supabase } from '@/lib/supabase'
+
+export default async function Home() {
+  const { data: propiedades } = await supabase
+    .from('propiedades')
+    .select('*')
+    .eq('activo', true)
+
   return (
     <div className="min-h-screen bg-white font-sans">
 
@@ -16,47 +23,32 @@ export default function Home() {
       </header>
 
       {/* Hero */}
-      <main
-        className="relative flex flex-col items-center justify-center text-center px-6 py-32"
-        style={{
-          background: "linear-gradient(135deg, #fff1f2 0%, #fce7f3 50%, #ede9fe 100%)",
-        }}
-      >
+      <main className="relative flex flex-col items-center justify-center text-center px-6 py-32"
+        style={{ background: "linear-gradient(135deg, #fff1f2 0%, #fce7f3 50%, #ede9fe 100%)" }}>
         <span className="text-xs font-semibold tracking-widest text-rose-400 uppercase mb-4">
           Buscador inmobiliario con IA · Chivilcoy
         </span>
-
         <h1 className="text-5xl font-bold text-zinc-900 max-w-2xl leading-tight mb-4">
           Encontrá tu próxima propiedad en Chivilcoy
         </h1>
-
         <p className="text-lg text-zinc-500 max-w-xl mb-10">
           Describí lo que buscás en tus propias palabras. Sin filtros complicados.
         </p>
-
-        {/* Buscador */}
         <div className="flex w-full max-w-2xl bg-white rounded-full shadow-lg px-2 py-2 gap-2">
-          <input
-            type="text"
+          <input type="text"
             placeholder="Ej: casa con jardín cerca de la plaza, 3 dormitorios..."
-            className="flex-1 px-5 py-2 text-sm text-zinc-800 outline-none bg-transparent"
-          />
+            className="flex-1 px-5 py-2 text-sm text-zinc-800 outline-none bg-transparent" />
           <button className="bg-rose-500 text-white text-sm font-semibold px-6 py-3 rounded-full hover:bg-rose-600 transition">
             Buscar
           </button>
         </div>
-
         <p className="text-xs text-zinc-400 mt-5">
           Más de 140 propiedades en Chivilcoy y alrededores
         </p>
-
-        {/* Filtros rápidos */}
         <div className="flex flex-wrap justify-center gap-3 mt-8">
           {["Casas", "Departamentos", "Terrenos", "Alquiler", "Venta", "Apto crédito"].map((f) => (
-            <button
-              key={f}
-              className="text-sm px-4 py-2 rounded-full border border-zinc-200 bg-white text-zinc-600 hover:border-rose-400 hover:text-rose-500 transition"
-            >
+            <button key={f}
+              className="text-sm px-4 py-2 rounded-full border border-zinc-200 bg-white text-zinc-600 hover:border-rose-400 hover:text-rose-500 transition">
               {f}
             </button>
           ))}
@@ -77,6 +69,29 @@ export default function Home() {
         ))}
       </section>
 
+      {/* Propiedades */}
+      <section className="max-w-6xl mx-auto px-6 py-16">
+        <h2 className="text-2xl font-bold text-zinc-900 mb-8">Propiedades disponibles</h2>
+        {propiedades && propiedades.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {propiedades.map((p) => (
+              <div key={p.id} className="border border-zinc-200 rounded-2xl p-5 hover:shadow-md transition">
+                <div className="bg-zinc-100 rounded-xl h-40 mb-4 flex items-center justify-center text-zinc-400 text-sm">
+                  Sin foto
+                </div>
+                <p className="text-xs text-rose-400 font-semibold uppercase mb-1">{p.tipo} · {p.operacion}</p>
+                <h3 className="text-base font-bold text-zinc-900 mb-1">{p.titulo}</h3>
+                <p className="text-sm text-zinc-500 mb-3">{p.barrio} · {p.direccion}</p>
+                <p className="text-lg font-bold text-zinc-900">{p.moneda} {p.precio?.toLocaleString()}</p>
+                <p className="text-xs text-zinc-400 mt-1">{p.dormitorios} dorm · {p.banos} baños · {p.superficie_m2} m²</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-zinc-400">No hay propiedades cargadas todavía.</p>
+        )}
+      </section>
+
     </div>
-  );
+  )
 }
