@@ -83,9 +83,17 @@ export default async function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {propiedades.map((p) => (
               <div key={p.id} className="border border-zinc-200 rounded-2xl p-5 hover:shadow-md transition">
-                <div className="bg-zinc-100 rounded-xl h-40 mb-4 flex items-center justify-center text-zinc-400 text-sm">
-                  Sin foto
-                </div>
+                {p.imagenes ? (
+                  <img
+                    src={p.imagenes}
+                    alt={p.titulo}
+                    className="rounded-xl h-40 w-full object-cover mb-4"
+                  />
+                ) : (
+                  <div className="bg-zinc-100 rounded-xl h-40 mb-4 flex items-center justify-center text-zinc-400 text-sm">
+                    Sin foto
+                  </div>
+                )}
                 <p className="text-xs text-rose-400 font-semibold uppercase mb-1">{p.tipo} · {p.operacion}</p>
                 <h3 className="text-base font-bold text-zinc-900 mb-1">{p.titulo}</h3>
                 <p className="text-sm text-zinc-500 mb-1">{p.ciudad} · {p.barrio}</p>
