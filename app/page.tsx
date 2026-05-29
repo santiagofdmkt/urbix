@@ -110,7 +110,10 @@ export default async function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {propiedades?.slice(0, 8).map(p => {
             const img = getImg(p.imagenes)
-            const titulo = p.titulo?.split(/[._\n]/)[0]?.trim() || p.titulo
+            const tituloCorto = (() => {
+  const t = p.titulo?.split(/[._\n]/)[0]?.trim() || p.titulo || ''
+  return t.length > 80 ? t.slice(0, 80).trim() + '...' : t
+})()
             return (
               <Link key={p.id} href={`/propiedad/${p.id}`} className="group block rounded-2xl overflow-hidden border border-zinc-100 hover:shadow-lg transition">
                 <div className="relative h-44 bg-zinc-100 overflow-hidden">
