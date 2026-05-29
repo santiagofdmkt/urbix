@@ -22,6 +22,11 @@ export default async function Home() {
     }
   }
 
+  function getTitulo(titulo: string | null): string {
+    const t = titulo?.trim() || ''
+    return t.length > 80 ? t.slice(0, 80).trim() + '...' : t
+  }
+
   return (
     <div className="min-h-screen bg-white font-sans">
 
@@ -59,8 +64,6 @@ export default async function Home() {
         <p className="text-lg text-zinc-500 max-w-lg mx-auto mb-10">
           Describí lo que buscás con tus palabras. Sin filtros complicados.
         </p>
-
-        {/* BUSCADOR */}
         <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-2xl shadow-xl px-4 py-3 flex items-center gap-3 mb-3">
             <svg className="w-5 h-5 text-zinc-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -110,10 +113,7 @@ export default async function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {propiedades?.slice(0, 8).map(p => {
             const img = getImg(p.imagenes)
-            const tituloCorto = (() => {
-  const t = p.titulo?.trim() || ''
-  return t.length > 80 ? t.slice(0, 80).trim() + '...' : t
-})()
+            const titulo = getTitulo(p.titulo)
             return (
               <Link key={p.id} href={`/propiedad/${p.id}`} className="group block rounded-2xl overflow-hidden border border-zinc-100 hover:shadow-lg transition">
                 <div className="relative h-44 bg-zinc-100 overflow-hidden">
@@ -170,7 +170,7 @@ export default async function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {propiedades?.map(p => {
             const img = getImg(p.imagenes)
-            const titulo = p.titulo?.split(/[._\n]/)[0]?.trim() || p.titulo
+            const titulo = getTitulo(p.titulo)
             return (
               <Link key={p.id} href={`/propiedad/${p.id}`} className="group block rounded-2xl overflow-hidden border border-zinc-100 hover:shadow-lg transition">
                 <div className="relative h-52 bg-zinc-100 overflow-hidden">

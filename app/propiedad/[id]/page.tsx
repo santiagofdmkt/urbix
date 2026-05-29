@@ -24,7 +24,10 @@ export default async function PropiedadDetalle({ params }: { params: Promise<{ i
 
   const imgs = parseImgs(p.imagenes)
   const precioM2 = p.superficie_m2 && p.precio ? Math.round(p.precio / p.superficie_m2) : null
-  const tituloCorto = p.titulo?.split(/[._\n]/)[0]?.trim() || p.titulo
+  const tituloCorto = (() => {
+  const t = p.titulo?.trim() || ''
+  return t.length > 80 ? t.slice(0, 80).trim() + '...' : t
+})()
   const descripcion = p.descripcion || p.titulo
 
   return (
