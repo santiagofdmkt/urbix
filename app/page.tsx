@@ -51,7 +51,7 @@ export default async function Home() {
       {/* HERO */}
       <section className="relative py-20 px-6 text-center overflow-hidden"
         style={{ background: "linear-gradient(135deg, #fff1f2 0%, #fce7f3 50%, #ede9fe 100%)" }}>
-        <p className="text-xs font-bold tracking-widest text-rose-400 uppercase mb-4">Buscador inmobiliario con IA · Chivilcoy</p>
+        <p className="text-xs font-bold tracking-widest text-rose-400 uppercase mb-4">Buscador inmobiliario con IA</p>
         <h1 className="text-5xl md:text-6xl font-bold text-zinc-900 leading-tight mb-3">
           Buscá propiedades<br />
           <span className="text-rose-500 italic">como te las imaginás</span>
@@ -86,7 +86,7 @@ export default async function Home() {
       <section className="border-b border-zinc-100 py-6">
         <div className="max-w-4xl mx-auto flex justify-center gap-16">
           {[
-            { num: `${total}`, label: "Propiedades en Chivilcoy" },
+            { num: `${total}`, label: "Propiedades disponibles" },
             { num: "IA", label: "Búsqueda inteligente" },
             { num: "100%", label: "Gratis para buscar" },
           ].map(s => (
@@ -103,7 +103,7 @@ export default async function Home() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Nuevas y destacadas</p>
-            <h2 className="text-2xl font-bold text-zinc-900">Lo último en Chivilcoy</h2>
+            <h2 className="text-2xl font-bold text-zinc-900">Lo último disponible</h2>
           </div>
           <button className="text-sm text-rose-500 hover:underline font-medium">Ver más →</button>
         </div>
@@ -160,7 +160,7 @@ export default async function Home() {
       <section className="max-w-7xl mx-auto px-6 py-12">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">100 propiedades recientes</p>
+            <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Propiedades recientes</p>
             <h2 className="text-2xl font-bold text-zinc-900">Todas las propiedades</h2>
           </div>
         </div>
@@ -178,7 +178,7 @@ export default async function Home() {
                 </div>
                 <div className="p-4">
                   <p className="text-sm font-semibold text-zinc-800 line-clamp-2 mb-1">{titulo}</p>
-                  <p className="text-xs text-zinc-400 line-clamp-1">{p.direccion}, Chivilcoy</p>
+                  <p className="text-xs text-zinc-400 line-clamp-1">{p.direccion}, {p.ciudad}</p>
                   <div className="flex gap-3 mt-2 text-xs text-zinc-500">
                     {p.dormitorios && <span>🛏 {p.dormitorios}</span>}
                     {p.banos && <span>🚿 {p.banos}</span>}
@@ -198,7 +198,7 @@ export default async function Home() {
             <div>
               <p className="text-2xl font-bold text-rose-400 mb-3">urbix</p>
               <p className="text-sm text-zinc-400 leading-relaxed">
-                El buscador inmobiliario con IA para Chivilcoy y la región. Encontrá tu próxima propiedad con solo describirla.
+                El buscador inmobiliario con IA para toda Argentina. Encontrá tu próxima propiedad con solo describirla.
               </p>
               <div className="flex gap-3 mt-4">
                 {["instagram", "twitter", "linkedin"].map(s => (
@@ -211,7 +211,7 @@ export default async function Home() {
             <div>
               <p className="text-sm font-semibold text-zinc-300 mb-4">Propiedades en Venta</p>
               <ul className="space-y-2 text-sm text-zinc-500">
-                {["Casas en Chivilcoy", "Departamentos", "Terrenos", "Quintas", "Locales comerciales"].map(l => (
+                {["Casas", "Departamentos", "Terrenos", "Quintas", "Locales comerciales"].map(l => (
                   <li key={l}><a href="#" className="hover:text-rose-400 transition">{l}</a></li>
                 ))}
               </ul>
@@ -235,7 +235,7 @@ export default async function Home() {
           </div>
           <div className="border-t border-zinc-800 pt-6 flex flex-col md:flex-row items-center justify-between gap-2">
             <p className="text-xs text-zinc-600">© 2026 Urbix. Todos los derechos reservados.</p>
-            <p className="text-xs text-zinc-600">Chivilcoy, Buenos Aires, Argentina</p>
+            <p className="text-xs text-zinc-600">Argentina</p>
           </div>
         </div>
       </footer>
