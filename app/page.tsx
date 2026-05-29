@@ -111,7 +111,7 @@ export default async function Home() {
           {propiedades?.slice(0, 8).map(p => {
             const img = getImg(p.imagenes)
             const tituloCorto = (() => {
-  const t = p.titulo?.split(/[._\n]/)[0]?.trim() || p.titulo || ''
+  const t = p.titulo?.trim() || ''
   return t.length > 80 ? t.slice(0, 80).trim() + '...' : t
 })()
             return (
