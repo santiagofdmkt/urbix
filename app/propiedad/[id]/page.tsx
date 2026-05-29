@@ -10,14 +10,16 @@ export default async function PropiedadDetalle({ params }: { params: Promise<{ i
 
   const parseImgs = (raw: any): string[] => {
     try {
+      if (!raw) return []
       if (Array.isArray(raw)) return raw
-      if (typeof raw === 'string' && raw.startsWith('http')) return [raw]
-      if (typeof raw === 'string') {
-        const parsed = JSON.parse(raw)
-        return Array.isArray(parsed) ? parsed : [parsed]
+      const str = typeof raw === 'string' ? raw.trim() : String(raw)
+      if (str.startsWith('[')) {
+        const parsed = JSON.parse(str)
+        return Array.isArray(parsed) ? parsed : []
       }
+      if (str.startsWith('http')) return [str]
       return []
-    } catch { return raw ? [raw] : [] }
+    } catch { return [] }
   }
 
   const imgs = parseImgs(p.imagenes)
