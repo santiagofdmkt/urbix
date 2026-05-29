@@ -36,6 +36,10 @@ async function subirImagenes(propId, urls, fuente) {
   for (let i = 0; i < Math.min(urls.length, 10); i++) {
     try {
       const { buffer, contentType } = await downloadImage(urls[i], referer);
+      if (!contentType.includes('jpeg') && !contentType.includes('jpg') && !contentType.includes('png') && !contentType.includes('webp')) {
+  console.log(`  img ${i}: saltada (${contentType})`);
+  continue;
+}
       const ext = contentType.includes('png') ? 'png' : 'jpg';
       const path = `${propId}/${i}.${ext}`;
       const { error } = await supabase.storage.from(BUCKET).upload(path, buffer, { contentType, upsert: true });
