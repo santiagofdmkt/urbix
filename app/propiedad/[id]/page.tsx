@@ -1,39 +1,72 @@
-import { createClient } from '@/lib/supabase'
-import { notFound } from 'next/navigation'
-import Link from 'next/link'
+import { supabase } from "@/lib/supabase"
+import { notFound } from "next/navigation"
+import Link from "next/link"
 
-export default async function PropiedadDetalle({ params }: { params: { id: string } }) {
-  const supabase = createClient()
-  const { data: p } = await supabase
-    .from('propiedades')
-    .select('*')
-    .eq('id', params.id)
-    .single()
-
+export default async function PropiedadDetalle({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const { data: p } = await supabase.from("propiedades").select("*").eq("id", id).single()
   if (!p) return notFound()
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
-      <h1 className="text-2xl font-bold text-zinc-900 mb-2">{p.titulo}</h1>
-      <p className="text-rose-500 font-semibold text-xl mb-4">
-        {p.moneda} {p.precio?.toLocaleString()}
-      </p>
-      {p.imagenes?.[0] && (
-        <img src={p.imagenes[0]} alt={p.titulo} className="w-full rounded-xl mb-4 object-cover max-h-96" />
-      )}
-      <p className="text-zinc-600 mb-2">📍 {p.direccion}, {p.barrio}</p>
-      <p className="text-zinc-700 mb-4">{p.descripcion}</p>
-      <div className="flex gap-4 text-sm text-zinc-500 mb-6">
-        {p.dormitorios && <span>🛏 {p.dormitorios} dorm.</span>}
-        {p.banos && <span>🚿 {p.banos} baños</span>}
-        {p.superficie_m2 && <span>📐 {p.superficie_m2} m²</span>}
+    <div className="min-h-screen bg-zinc-50">
+      {/* Header */}
+      <div className="bg-white border-b border-zinc-200 px-6 py-4">
+        <Link href="/"><span className="text-rose-500 text-sm font-medium hover:underline cursor-pointer">← Volver al inicio</span></Link>
       </div>
-      <div className="bg-rose-50 rounded-xl p-4 mb-6">
-        <h2 className="text-lg font-bold text-zinc-900 mb-2">Contactar</h2>
-        {p.url_origen && <a href={p.url_origen} target="_blank" rel="noopener noreferrer" className="block w-full text-center bg-rose-500 text-white font-semibold py-2 rounded-lg mb-2">Ver en {p.fuente}</a>}
-        {p.contacto && <p className="text-sm text-zinc-500 text-center">{p.contacto}</p>}
+
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        {/* Imagen */}
+        {p.imagenes?.[0] && (
+          <img src={p.imagenes[0]} alt={p.titulo} className="w-full h-72 object-cover rounded-2xl mb-6 shadow" />
+        )}
+
+        {/* Precio y título */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm mb-4">
+          <p className="text-3xl font-bold text-rose-500 mb-2">{p.moneda} {p.precio?.toLocaleString()}</p>
+          <h1 className="text-xl font-semibold text-zinc-800">{p.titulo}</h1>
+          <p className="text-zinc-500 text-sm mt-1">{p.direccion}{p.barrio ? `, ${p.barrio}` : ""}</p>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          {p.dormitorios && (
+            <div className="bg-white rounded-xl p-4 text-center shadow-sm">
+              <p className="text-2xl font-bold text-zinc-800">{p.dormitorios}</p>
+              <p className="text-xs text-zinc-500 mt-1">Dormitorios</p>
+            </div>
+          )}
+          {p.banos && (
+            <div className="bg-white rounded-xl p-4 text-center shadow-sm">
+              <p className="text-2xl font-bold text-zinc-800">{p.banos}</p>
+              <p className="text-xs text-zinc-500 mt-1">Baños</p>
+            </div>
+          )}
+          {p.superficie_m2 && (
+            <div className="bg-white rounded-xl p-4 text-center shadow-sm">
+              <p className="text-2xl font-bold text-zinc-800">{p.superficie_m2}</p>
+              <p className="text-xs text-zinc-500 mt-1">m²</p>
+            </div>
+          )}
+        </div>
+
+        {/* Descripción */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm mb-4">
+          <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">Descripción</h2>
+          <p className="text-zinc-700 text-sm leading-relaxed">{p.descripcion}</p>
+        </div>
+
+        {/* Contacto */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-4">Contactar</h2>
+          {p.url_origen && (
+            <a href={p.url_origen} target="_blank" rel="noopener noreferrer"
+              className="block w-full text-center bg-rose-500 hover:bg-rose-600 text-white font-semibold py-3 rounded-xl transition mb-3">
+              Ver en {p.fuente}
+            </a>
+          )}
+          {p.contacto && <p className="text-sm text-zinc-500 text-center">{p.contacto}</p>}
+        </div>
       </div>
-      <div className="mt-8"><Link href="/"><span className="text-sm text-rose-500 hover:underline cursor-pointer">← Volver al inicio</span></Link></div>
     </div>
   )
 }
