@@ -1,3 +1,5 @@
+'use client'
+import { useEffect, useState } from 'react'
 import { supabase } from "@/lib/supabase"
 import { notFound } from "next/navigation"
 import Link from "next/link"
@@ -26,58 +28,29 @@ export default async function PropiedadDetalle({ params }: { params: Promise<{ i
 
   return (
     <div className="min-h-screen bg-zinc-50">
-
       <nav className="bg-white border-b border-zinc-100 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-6 py-3 flex items-center gap-2 text-sm">
           <Link href="/" className="text-rose-500 font-bold text-lg tracking-tight">urbix</Link>
           <span className="text-zinc-200">/</span>
-          <Link href="/" className="text-zinc-400 hover:text-zinc-600 transition">Chivilcoy</Link>
+          <Link href="/" className="text-zinc-400 hover:text-zinc-600 transition">{p.ciudad}</Link>
           <span className="text-zinc-200">/</span>
           <span className="text-zinc-400 truncate max-w-xs text-xs">{tituloCorto}</span>
         </div>
       </nav>
 
       <div className="max-w-6xl mx-auto px-4 py-8">
-
         <div className="mb-5">
           <h1 className="text-2xl font-bold text-zinc-900 leading-snug mb-1">{tituloCorto}</h1>
           <div className="flex items-center gap-1 text-zinc-400 text-xs">
             <svg className="w-3.5 h-3.5 text-rose-400 shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/>
             </svg>
-            {p.direccion}{p.barrio ? `, ${p.barrio}` : ""}, Chivilcoy, Buenos Aires
+            {p.direccion}{p.barrio ? `, ${p.barrio}` : ""}{p.ciudad ? `, ${p.ciudad}` : ""}
           </div>
         </div>
 
-        <div className="mb-6 rounded-2xl overflow-hidden bg-zinc-100 h-80 relative">
-          {imgs.length > 0 ? (
-            <div className="grid grid-cols-4 grid-rows-2 gap-1 w-full h-full">
-              <div className="col-span-2 row-span-2 overflow-hidden">
-                <img src={imgs[0]} alt={tituloCorto} className="w-full h-full object-cover hover:scale-105 transition duration-500" />
-              </div>
-              {[1,2,3,4].map(i => (
-                <div key={i} className="overflow-hidden relative bg-zinc-200">
-                  {imgs[i] && <img src={imgs[i]} alt="" className="w-full h-full object-cover hover:scale-105 transition duration-500" />}
-                  {i === 3 && imgs.length > 5 && (
-                    <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white cursor-pointer">
-                      <svg className="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                      </svg>
-                      <span className="text-xs font-medium">+{imgs.length - 4} fotos</span>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full text-zinc-300 gap-2">
-              <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-              </svg>
-              <span className="text-sm text-zinc-400">Sin imágenes disponibles</span>
-            </div>
-          )}
-        </div>
+        {/* GALERÍA CON LIGHTBOX */}
+        <GaleriaConLightbox imgs={imgs} titulo={tituloCorto} />
 
         <div className="bg-white rounded-2xl border border-zinc-100 px-6 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
           <div>
@@ -112,12 +85,10 @@ export default async function PropiedadDetalle({ params }: { params: Promise<{ i
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-
           <div className="lg:col-span-2 bg-white rounded-2xl border border-zinc-100 p-6">
             <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Descripción</h2>
             <p className="text-zinc-500 text-sm leading-relaxed whitespace-pre-line">{descripcion}</p>
           </div>
-
           <div className="space-y-3">
             <div className="bg-white rounded-2xl border border-zinc-100 p-6 sticky top-20">
               <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Publicado por</h2>
@@ -136,9 +107,80 @@ export default async function PropiedadDetalle({ params }: { params: Promise<{ i
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>
+  )
+}
+
+function GaleriaConLightbox({ imgs, titulo }: { imgs: string[], titulo: string }) {
+  const [lightbox, setLightbox] = useState<number | null>(null)
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setLightbox(null)
+      if (e.key === 'ArrowRight' && lightbox !== null) setLightbox(i => i! < imgs.length - 1 ? i! + 1 : 0)
+      if (e.key === 'ArrowLeft' && lightbox !== null) setLightbox(i => i! > 0 ? i! - 1 : imgs.length - 1)
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [lightbox, imgs.length])
+
+  return (
+    <>
+      {/* GALERÍA PRINCIPAL */}
+      <div className="mb-6 rounded-2xl overflow-hidden bg-zinc-100 h-80 relative">
+        {imgs.length > 0 ? (
+          <div className="grid grid-cols-4 grid-rows-2 gap-1 w-full h-full">
+            <div className="col-span-2 row-span-2 overflow-hidden cursor-pointer" onClick={() => setLightbox(0)}>
+              <img src={imgs[0]} alt={titulo} className="w-full h-full object-cover hover:scale-105 transition duration-500" />
+            </div>
+            {[1,2,3,4].map(i => (
+              <div key={i} className="overflow-hidden relative bg-zinc-200 cursor-pointer" onClick={() => imgs[i] && setLightbox(i)}>
+                {imgs[i] && <img src={imgs[i]} alt="" className="w-full h-full object-cover hover:scale-105 transition duration-500" />}
+                {i === 3 && imgs.length > 5 && (
+                  <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-white">
+                    <svg className="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    <span className="text-xs font-semibold">+{imgs.length - 4} fotos</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full text-zinc-300 gap-2">
+            <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <span className="text-sm text-zinc-400">Sin imágenes disponibles</span>
+          </div>
+        )}
+      </div>
+
+      {/* MINIATURAS */}
+      {imgs.length > 1 && (
+        <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+          {imgs.map((img, i) => (
+            <img key={i} src={img} alt="" onClick={() => setLightbox(i)}
+              className="w-20 h-16 object-cover rounded-lg cursor-pointer shrink-0 border-2 border-transparent hover:border-rose-400 transition" />
+          ))}
+        </div>
+      )}
+
+      {/* LIGHTBOX */}
+      {lightbox !== null && (
+        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center" onClick={() => setLightbox(null)}>
+          <button className="absolute top-4 right-4 text-white text-3xl hover:text-rose-400" onClick={() => setLightbox(null)}>✕</button>
+          <button className="absolute left-4 text-white text-4xl hover:text-rose-400 px-4"
+            onClick={e => { e.stopPropagation(); setLightbox(i => i! > 0 ? i! - 1 : imgs.length - 1) }}>‹</button>
+          <img src={imgs[lightbox]} alt="" className="max-h-[90vh] max-w-[90vw] object-contain rounded-xl" onClick={e => e.stopPropagation()} />
+          <button className="absolute right-4 text-white text-4xl hover:text-rose-400 px-4"
+            onClick={e => { e.stopPropagation(); setLightbox(i => i! < imgs.length - 1 ? i! + 1 : 0) }}>›</button>
+          <p className="absolute bottom-4 text-white/60 text-sm">{lightbox + 1} / {imgs.length}</p>
+        </div>
+      )}
+    </>
   )
 }
