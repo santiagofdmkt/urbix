@@ -78,8 +78,7 @@ export default async function PropiedadDetalle({ params }: { params: { id: strin
         {/* Contacto */}
         <div className="bg-rose-50 rounded-2xl p-6">
           <h2 className="text-lg font-bold text-zinc-900 mb-4">Contactar</h2>
-          {p.url_origen && (
-            
+          {p.url_origen && (<a  
               href={p.url_origen}
               target="_blank"
               rel="noopener noreferrer"
