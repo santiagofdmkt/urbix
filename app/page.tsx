@@ -6,10 +6,15 @@ export default async function Home() {
     .from('propiedades')
     .select('*')
     .eq('activo', true)
-    .like('imagenes', '%supabase%')
+    .not('imagenes', 'is', null)
     .order('created_at', { ascending: false })
 
-  const total = propiedades?.length || 0
+  const { count: totalDB } = await supabase
+    .from('propiedades')
+    .select('*', { count: 'exact', head: true })
+    .eq('activo', true)
+
+  const total = totalDB || 0
 
   function getImg(imagenes: any): string | null {
     try {
