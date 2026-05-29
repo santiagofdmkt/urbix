@@ -6,113 +6,239 @@ export default async function Home() {
     .from('propiedades')
     .select('*')
     .eq('activo', true)
-    .not('imagenes', 'is', null)
+    .like('imagenes', '%supabase%')
+    .order('created_at', { ascending: false })
+
+  const total = propiedades?.length || 0
+
+  function getImg(imagenes: any): string | null {
+    try {
+      if (!imagenes) return null
+      const raw = typeof imagenes === 'string' ? JSON.parse(imagenes) : imagenes
+      const src = Array.isArray(raw) ? raw[0] : raw
+      return typeof src === 'string' && src.startsWith('http') ? src : null
+    } catch {
+      return typeof imagenes === 'string' && imagenes.startsWith('http') ? imagenes : null
+    }
+  }
 
   return (
     <div className="min-h-screen bg-white font-sans">
 
-      {/* Header */}
-      <header className="flex items-center justify-between px-8 py-4">
-        <span className="text-2xl font-bold text-rose-500">urbix</span>
-        <div className="flex items-center gap-4">
-          <button className="text-sm font-medium text-zinc-700 hover:text-zinc-900 transition">
-            Publicar propiedad
-          </button>
-          <button className="bg-rose-500 text-white text-sm font-medium px-5 py-2 rounded-full hover:bg-rose-600 transition">
-            Registrar inmobiliaria
-          </button>
+      {/* NAV */}
+      <header className="bg-white border-b border-zinc-100 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+          <Link href="/" className="text-2xl font-bold text-rose-500 tracking-tight">urbix</Link>
+          <nav className="hidden md:flex items-center gap-6 text-sm">
+            <Link href="#" className="text-zinc-500 hover:text-zinc-800 transition">Comprar</Link>
+            <Link href="#" className="text-zinc-500 hover:text-zinc-800 transition">Alquilar</Link>
+            <Link href="#" className="text-zinc-500 hover:text-zinc-800 transition font-medium">Soy inmobiliaria</Link>
+          </nav>
+          <div className="flex items-center gap-3">
+            <button className="text-sm text-zinc-600 hover:text-zinc-900 transition font-medium">Iniciar sesión</button>
+            <button className="bg-rose-500 hover:bg-rose-600 text-white text-sm font-semibold px-4 py-2 rounded-full transition">
+              Registrarse
+            </button>
+            <button className="w-9 h-9 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center transition">
+              <svg className="w-5 h-5 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+              </svg>
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* Hero */}
-      <main className="relative flex flex-col items-center justify-center text-center px-6 py-32"
+      {/* HERO */}
+      <section className="relative py-20 px-6 text-center overflow-hidden"
         style={{ background: "linear-gradient(135deg, #fff1f2 0%, #fce7f3 50%, #ede9fe 100%)" }}>
-        <span className="text-xs font-semibold tracking-widest text-rose-400 uppercase mb-4">
-          Buscador inmobiliario con IA
-        </span>
-        <h1 className="text-5xl font-bold text-zinc-900 max-w-2xl leading-tight mb-4">
-          Encontrá tu próxima propiedad
+        <p className="text-xs font-bold tracking-widest text-rose-400 uppercase mb-4">Buscador inmobiliario con IA · Chivilcoy</p>
+        <h1 className="text-5xl md:text-6xl font-bold text-zinc-900 leading-tight mb-3">
+          Buscá propiedades<br />
+          <span className="text-rose-500 italic">como te las imaginás</span>
         </h1>
-        <p className="text-lg text-zinc-500 max-w-xl mb-10">
-          Describí lo que buscás en tus propias palabras. Sin filtros complicados.
+        <p className="text-lg text-zinc-500 max-w-lg mx-auto mb-10">
+          Describí lo que buscás con tus palabras. Sin filtros complicados.
         </p>
 
-        {/* Buscador */}
-        <div className="flex flex-col w-full max-w-2xl gap-3">
-          <div className="flex bg-white rounded-full shadow-lg px-2 py-2 gap-2">
-            <input type="text"
-              placeholder="Ej: casa con jardín, 3 dormitorios, cerca de la plaza..."
-              className="flex-1 px-5 py-2 text-sm text-zinc-800 outline-none bg-transparent" />
-            <button className="bg-rose-500 text-white text-sm font-semibold px-6 py-3 rounded-full hover:bg-rose-600 transition">
+        {/* BUSCADOR */}
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-white rounded-2xl shadow-xl px-4 py-3 flex items-center gap-3 mb-3">
+            <svg className="w-5 h-5 text-zinc-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input type="text" placeholder="Ej: casa con jardín, 3 dormitorios, cerca de la plaza..."
+              className="flex-1 text-sm text-zinc-800 outline-none bg-transparent placeholder-zinc-400" />
+            <button className="bg-rose-500 hover:bg-rose-600 text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition">
               Buscar
             </button>
           </div>
-          <div className="flex bg-white rounded-full shadow px-2 py-2 gap-2">
-            <input type="text"
-              placeholder="Ciudad (ej: Chivilcoy, Mercedes, Suipacha...)"
-              className="flex-1 px-5 py-2 text-sm text-zinc-800 outline-none bg-transparent" />
-          </div>
-        </div>
-
-        <div className="flex flex-wrap justify-center gap-3 mt-8">
-          {["Casas", "Departamentos", "Terrenos", "Alquiler", "Venta", "Apto crédito"].map((f) => (
-            <button key={f}
-              className="text-sm px-4 py-2 rounded-full border border-zinc-200 bg-white text-zinc-600 hover:border-rose-400 hover:text-rose-500 transition">
-              {f}
-            </button>
-          ))}
-        </div>
-      </main>
-
-      {/* Stats */}
-      <section className="flex justify-center gap-12 py-10 border-b border-zinc-100">
-        {[
-          { num: `${propiedades?.length || 0}`, label: "Propiedades" },
-          { num: "IA", label: "Búsqueda inteligente" },
-          { num: "100%", label: "Gratis para buscar" },
-        ].map((s) => (
-          <div key={s.label} className="text-center">
-            <p className="text-2xl font-bold text-rose-500">{s.num}</p>
-            <p className="text-sm text-zinc-500">{s.label}</p>
-          </div>
-        ))}
-      </section>
-
-      {/* Propiedades */}
-      <section className="max-w-6xl mx-auto px-6 py-16">
-        <h2 className="text-2xl font-bold text-zinc-900 mb-8">Propiedades disponibles</h2>
-        {propiedades && propiedades.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {propiedades.map((p) => (
-              <Link key={p.id} href={`/propiedad/${p.id}`} className="border border-zinc-200 rounded-2xl overflow-hidden hover:shadow-md transition cursor-pointer block">
-                {p.imagenes && (
-                  <img
-                    src={Array.isArray(p.imagenes) ? p.imagenes[0] : p.imagenes}
-                    alt={p.titulo}
-                    className="h-48 w-full object-cover"
-                  />
-                )}
-                <div className="p-4">
-                  <h3 className="text-sm font-bold text-zinc-900 mb-1 line-clamp-2">
-                    {p.titulo}
-                  </h3>
-                  <p className="text-xs text-zinc-400 mb-3">{p.direccion}</p>
-                  <p className="text-lg font-bold text-zinc-900">
-                    {p.moneda} {p.precio?.toLocaleString()}
-                  </p>
-                  <p className="text-xs text-zinc-400 mt-1">
-                    {p.dormitorios ? `${p.dormitorios} dorm · ` : ''}
-                    {p.banos ? `${p.banos} baños · ` : ''}
-                    {p.superficie_m2 ? `${p.superficie_m2} m²` : ''}
-                  </p>
-                </div>
-              </Link>
+          <div className="flex flex-wrap justify-center gap-2">
+            {["Casas", "Departamentos", "Terrenos", "Alquiler", "Venta", "Apto crédito"].map(f => (
+              <button key={f} className="text-xs px-4 py-1.5 rounded-full border border-zinc-200 bg-white/80 text-zinc-600 hover:border-rose-400 hover:text-rose-500 transition">
+                {f}
+              </button>
             ))}
           </div>
-        ) : (
-          <p className="text-zinc-400">No hay propiedades cargadas todavía.</p>
-        )}
+        </div>
       </section>
+
+      {/* STATS */}
+      <section className="border-b border-zinc-100 py-6">
+        <div className="max-w-4xl mx-auto flex justify-center gap-16">
+          {[
+            { num: `${total}`, label: "Propiedades en Chivilcoy" },
+            { num: "IA", label: "Búsqueda inteligente" },
+            { num: "100%", label: "Gratis para buscar" },
+          ].map(s => (
+            <div key={s.label} className="text-center">
+              <p className="text-2xl font-bold text-rose-500">{s.num}</p>
+              <p className="text-xs text-zinc-400 mt-0.5">{s.label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* PROPIEDADES RECIENTES */}
+      <section className="max-w-7xl mx-auto px-6 py-12">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Nuevas y destacadas</p>
+            <h2 className="text-2xl font-bold text-zinc-900">Lo último en Chivilcoy</h2>
+          </div>
+          <button className="text-sm text-rose-500 hover:underline font-medium">Ver más →</button>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {propiedades?.slice(0, 8).map(p => {
+            const img = getImg(p.imagenes)
+            const titulo = p.titulo?.split(/[._\n]/)[0]?.trim() || p.titulo
+            return (
+              <Link key={p.id} href={`/propiedad/${p.id}`} className="group block rounded-2xl overflow-hidden border border-zinc-100 hover:shadow-lg transition">
+                <div className="relative h-44 bg-zinc-100 overflow-hidden">
+                  {img && <img src={img} alt={titulo} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />}
+                  <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-xs font-semibold text-rose-500 px-2 py-1 rounded-lg">
+                    {p.moneda} {p.precio?.toLocaleString("es-AR")}
+                  </div>
+                </div>
+                <div className="p-3">
+                  <p className="text-sm font-semibold text-zinc-800 line-clamp-1">{titulo}</p>
+                  <p className="text-xs text-zinc-400 mt-0.5 line-clamp-1">{p.direccion}</p>
+                  <div className="flex gap-3 mt-2 text-xs text-zinc-500">
+                    {p.dormitorios && <span>{p.dormitorios} dorm.</span>}
+                    {p.banos && <span>{p.banos} baños</span>}
+                    {p.superficie_m2 && <span>{p.superficie_m2} m²</span>}
+                  </div>
+                </div>
+              </Link>
+            )
+          })}
+        </div>
+      </section>
+
+      {/* EXPLORAR POR CATEGORÍA */}
+      <section className="bg-zinc-50 py-12">
+        <div className="max-w-7xl mx-auto px-6">
+          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Explorá por categoría</p>
+          <h2 className="text-2xl font-bold text-zinc-900 mb-6">Encontrá lo que buscás más rápido</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { label: "Casas", icon: "🏠", desc: "Casas en venta" },
+              { label: "Departamentos", icon: "🏢", desc: "Deptos y PHs" },
+              { label: "Terrenos", icon: "🌿", desc: "Lotes y terrenos" },
+              { label: "Quintas", icon: "🏡", desc: "Casas quinta" },
+            ].map(cat => (
+              <button key={cat.label} className="bg-white rounded-2xl p-5 text-left border border-zinc-100 hover:border-rose-300 hover:shadow-md transition group">
+                <span className="text-3xl mb-3 block">{cat.icon}</span>
+                <p className="font-semibold text-zinc-800 text-sm">{cat.label}</p>
+                <p className="text-xs text-zinc-400 mt-0.5">{cat.desc}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* TODAS LAS PROPIEDADES */}
+      <section className="max-w-7xl mx-auto px-6 py-12">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">100 propiedades recientes</p>
+            <h2 className="text-2xl font-bold text-zinc-900">Todas las propiedades</h2>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {propiedades?.map(p => {
+            const img = getImg(p.imagenes)
+            const titulo = p.titulo?.split(/[._\n]/)[0]?.trim() || p.titulo
+            return (
+              <Link key={p.id} href={`/propiedad/${p.id}`} className="group block rounded-2xl overflow-hidden border border-zinc-100 hover:shadow-lg transition">
+                <div className="relative h-52 bg-zinc-100 overflow-hidden">
+                  {img && <img src={img} alt={titulo} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />}
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                    <p className="text-white font-bold text-lg">{p.moneda} {p.precio?.toLocaleString("es-AR")}</p>
+                  </div>
+                </div>
+                <div className="p-4">
+                  <p className="text-sm font-semibold text-zinc-800 line-clamp-2 mb-1">{titulo}</p>
+                  <p className="text-xs text-zinc-400 line-clamp-1">{p.direccion}, Chivilcoy</p>
+                  <div className="flex gap-3 mt-2 text-xs text-zinc-500">
+                    {p.dormitorios && <span>🛏 {p.dormitorios}</span>}
+                    {p.banos && <span>🚿 {p.banos}</span>}
+                    {p.superficie_m2 && <span>📐 {p.superficie_m2} m²</span>}
+                  </div>
+                </div>
+              </Link>
+            )
+          })}
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="bg-zinc-900 text-white pt-16 pb-8">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+            <div>
+              <p className="text-2xl font-bold text-rose-400 mb-3">urbix</p>
+              <p className="text-sm text-zinc-400 leading-relaxed">
+                El buscador inmobiliario con IA para Chivilcoy y la región. Encontrá tu próxima propiedad con solo describirla.
+              </p>
+              <div className="flex gap-3 mt-4">
+                {["instagram", "twitter", "linkedin"].map(s => (
+                  <a key={s} href="#" className="w-8 h-8 bg-zinc-800 hover:bg-rose-500 rounded-full flex items-center justify-center transition">
+                    <span className="text-xs text-zinc-400 hover:text-white">{s[0].toUpperCase()}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-zinc-300 mb-4">Propiedades en Venta</p>
+              <ul className="space-y-2 text-sm text-zinc-500">
+                {["Casas en Chivilcoy", "Departamentos", "Terrenos", "Quintas", "Locales comerciales"].map(l => (
+                  <li key={l}><a href="#" className="hover:text-rose-400 transition">{l}</a></li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-zinc-300 mb-4">Herramientas</p>
+              <ul className="space-y-2 text-sm text-zinc-500">
+                {["Búsqueda con IA", "Favoritos", "Alertas de precio", "Comparar propiedades", "Calculadora"].map(l => (
+                  <li key={l}><a href="#" className="hover:text-rose-400 transition">{l}</a></li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-zinc-300 mb-4">Empresa</p>
+              <ul className="space-y-2 text-sm text-zinc-500">
+                {["Acerca de urbix", "Soy inmobiliaria", "Contacto", "Términos de uso", "Política de privacidad"].map(l => (
+                  <li key={l}><a href="#" className="hover:text-rose-400 transition">{l}</a></li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-zinc-800 pt-6 flex flex-col md:flex-row items-center justify-between gap-2">
+            <p className="text-xs text-zinc-600">© 2026 Urbix. Todos los derechos reservados.</p>
+            <p className="text-xs text-zinc-600">Chivilcoy, Buenos Aires, Argentina</p>
+          </div>
+        </div>
+      </footer>
 
     </div>
   )
