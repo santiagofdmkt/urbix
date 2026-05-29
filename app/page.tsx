@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 
 export default async function Home() {
@@ -83,7 +84,7 @@ export default async function Home() {
         {propiedades && propiedades.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {propiedades.map((p) => (
-              <div key={p.id} className="border border-zinc-200 rounded-2xl overflow-hidden hover:shadow-md transition cursor-pointer">
+              <Link key={p.id} href={`/propiedad/${p.id}`} className="border border-zinc-200 rounded-2xl overflow-hidden hover:shadow-md transition cursor-pointer block">
                 {p.imagenes && (
                   <img
                     src={p.imagenes}
@@ -105,7 +106,7 @@ export default async function Home() {
                     {p.superficie_m2 ? `${p.superficie_m2} m²` : ''}
                   </p>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         ) : (
