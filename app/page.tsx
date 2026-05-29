@@ -87,7 +87,7 @@ export default async function Home() {
               <Link key={p.id} href={`/propiedad/${p.id}`} className="border border-zinc-200 rounded-2xl overflow-hidden hover:shadow-md transition cursor-pointer block">
                 {p.imagenes && (
                   <img
-                    src={p.imagenes}
+                    src={Array.isArray(p.imagenes) ? p.imagenes[0] : p.imagenes}
                     alt={p.titulo}
                     className="h-48 w-full object-cover"
                   />
