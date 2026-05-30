@@ -13,19 +13,25 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
 function limpiarPrecio(texto) {
   if (!texto) return null;
-  const num = texto.replace(/[^0-9]/g, '');
-  return num ? parseInt(num) : null;
+  // Toma solo el primer bloque numérico (ej: "USD 115.000 | $ 342.000" → 115000)
+  const match = texto.match(/[\d.]+/);
+  if (!match) return null;
+  const num = match[0].replace(/\./g, '');
+  return parseInt(num) || null;
 }
+
 function limpiarSuperficie(texto) {
   if (!texto) return null;
   const match = texto.match(/(\d+(?:[.,]\d+)?)/);
   return match ? parseFloat(match[1].replace(',', '.')) : null;
 }
+
 function limpiarInt(texto) {
   if (!texto) return null;
   const match = texto.match(/\d+/);
   return match ? parseInt(match[0]) : null;
 }
+
 async function yaExiste(url) {
   const { data } = await supabase.from('propiedades').select('id').eq('url_origen', url).limit(1);
   return data && data.length > 0;
@@ -135,7 +141,6 @@ async function guardarPropiedad(prop, page) {
   if (imagenesUrls.length > 0) {
     const publicUrls = await subirImagenes(propId, imagenesUrls, prop.fuente);
     if (publicUrls.length > 0) {
-      // ✅ FIX: guardar array completo, no solo la primera imagen
       await supabase.from('propiedades').update({ imagenes: JSON.stringify(publicUrls) }).eq('id', propId);
       console.log(`  ✅ Guardada con ${publicUrls.length} imágenes: ${prop.titulo}`);
     }
@@ -269,20 +274,3 @@ async function main() {
   const page = await context.newPage();
 
   try {
-    const propsArgenprop = await scrapearArgenprop(page);
-    console.log(`\n💾 Guardando ${propsArgenprop.length} de Argenprop...`);
-    for (const prop of propsArgenprop) await guardarPropiedad(prop, page);
-
-    const propsZonaprop = await scrapearZonaprop(page);
-    console.log(`\n💾 Guardando ${propsZonaprop.length} de ZonaProp...`);
-    for (const prop of propsZonaprop) await guardarPropiedad(prop, page);
-
-  } catch (err) {
-    console.error('❌ Error:', err.message);
-  } finally {
-    await browser.close();
-    console.log('\n✅ Scraper finalizado.');
-  }
-}
-
-main();
