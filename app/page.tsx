@@ -2,12 +2,31 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 
 export default async function Home() {
-  const { data: propiedades } = await supabase
+  const { data: raw } = await supabase
     .from('propiedades')
     .select('*')
     .eq('activo', true)
     .not('imagenes', 'is', null)
     .order('created_at', { ascending: false })
+
+  // Ordenar: primero las que tienen foto en Supabase Storage, luego por cantidad de fotos
+  const propiedades = (raw || []).sort((a, b) => {
+    const tieneStorage = (p: any) => {
+      try {
+        const imgs = JSON.parse(p.imagenes)
+        return Array.isArray(imgs) && imgs[0]?.includes('supabase.co') ? 1 : 0
+      } catch { return 0 }
+    }
+    const countImgs = (p: any) => {
+      try {
+        const imgs = JSON.parse(p.imagenes)
+        return Array.isArray(imgs) ? imgs.length : 1
+      } catch { return 1 }
+    }
+    const diff = tieneStorage(b) - tieneStorage(a)
+    if (diff !== 0) return diff
+    return countImgs(b) - countImgs(a)
+  })
 
   const { count: totalDB } = await supabase
     .from('propiedades')
@@ -20,10 +39,13 @@ export default async function Home() {
     try {
       if (!imagenes) return null
       const raw = typeof imagenes === 'string' ? JSON.parse(imagenes) : imagenes
-      const src = Array.isArray(raw) ? raw[0] : raw
-      return typeof src === 'string' && src.startsWith('http') ? src : null
+      const arr = Array.isArray(raw) ? raw : [raw]
+      const real = arr.find((src: string) =>
+        typeof src === 'string' && src.includes('supabase.co')
+      )
+      return real || null
     } catch {
-      return typeof imagenes === 'string' && imagenes.startsWith('http') ? imagenes : null
+      return null
     }
   }
 
@@ -118,11 +140,12 @@ export default async function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {propiedades?.slice(0, 8).map(p => {
             const img = getImg(p.imagenes)
+            if (!img) return null
             const titulo = getTitulo(p.titulo)
             return (
               <Link key={p.id} href={`/propiedad/${p.id}`} className="group block rounded-2xl overflow-hidden border border-zinc-100 hover:shadow-lg transition">
                 <div className="relative h-44 bg-zinc-100 overflow-hidden">
-                  {img && <img src={img} alt={titulo} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />}
+                  <img src={img} alt={titulo} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                   <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-xs font-semibold text-rose-500 px-2 py-1 rounded-lg">
                     {p.moneda} {p.precio?.toLocaleString("es-AR")}
                   </div>
@@ -175,11 +198,12 @@ export default async function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {propiedades?.map(p => {
             const img = getImg(p.imagenes)
+            if (!img) return null
             const titulo = getTitulo(p.titulo)
             return (
               <Link key={p.id} href={`/propiedad/${p.id}`} className="group block rounded-2xl overflow-hidden border border-zinc-100 hover:shadow-lg transition">
                 <div className="relative h-52 bg-zinc-100 overflow-hidden">
-                  {img && <img src={img} alt={titulo} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />}
+                  <img src={img} alt={titulo} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
                     <p className="text-white font-bold text-lg">{p.moneda} {p.precio?.toLocaleString("es-AR")}</p>
                   </div>
