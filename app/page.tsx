@@ -78,7 +78,7 @@ export default async function Home() {
   }
 
   const destacadas = propiedades.slice(0, 8)
-  const todas = propiedades
+  const recientes = propiedades.slice(0, 9)
 
   return (
     <div className="min-h-screen bg-white font-sans">
@@ -195,7 +195,7 @@ export default async function Home() {
             <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Nuevas y destacadas</p>
             <h2 className="text-2xl font-bold text-zinc-900">Lo último disponible</h2>
           </div>
-          <Link href="#todas" className="text-sm text-rose-500 hover:underline font-medium">Ver más →</Link>
+          <Link href="/propiedades" className="text-sm text-rose-500 hover:underline font-medium">Ver más →</Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {destacadas.map(p => {
@@ -236,7 +236,10 @@ export default async function Home() {
               const tiene = cant > 0
               const foto = FOTOS_LOCALIDADES[loc.nombre] || DEFAULT_FOTO
               return (
-                <div key={loc.nombre} className={`relative rounded-2xl overflow-hidden group cursor-pointer ${tiene ? 'hover:shadow-lg' : 'opacity-70'} transition`}>
+                <Link
+                  key={loc.nombre}
+                  href={tiene ? '/localidad/' + encodeURIComponent(loc.nombre) : '#'}
+                  className={`relative rounded-2xl overflow-hidden group cursor-pointer ${tiene ? 'hover:shadow-lg' : 'opacity-70 pointer-events-none'} transition`}>
                   <div className="h-28 relative">
                     <img src={foto} alt={loc.nombre} className={`w-full h-full object-cover ${tiene ? 'group-hover:scale-105' : 'grayscale'} transition duration-500`} />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
@@ -254,23 +257,23 @@ export default async function Home() {
                   <div className="absolute bottom-0 left-0 right-0 p-2">
                     <p className="text-white text-xs font-semibold leading-tight">{loc.nombre}</p>
                   </div>
-                </div>
+                </Link>
               )
             })}
           </div>
         </div>
       </section>
 
-      {/* TODAS LAS PROPIEDADES */}
+      {/* PROPIEDADES RECIENTES */}
       <section id="todas" className="max-w-7xl mx-auto px-6 py-12">
         <div className="flex items-center justify-between mb-6">
           <div>
             <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Propiedades recientes</p>
-            <h2 className="text-2xl font-bold text-zinc-900">Todas las propiedades</h2>
+            <h2 className="text-2xl font-bold text-zinc-900">Últimas incorporaciones</h2>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {todas.map(p => {
+          {recientes.map(p => {
             const img = getImg(p.imagenes)
             if (!img) return null
             const titulo = getTitulo(p.titulo)
@@ -295,6 +298,12 @@ export default async function Home() {
             )
           })}
         </div>
+        <div className="text-center mt-10">
+          <Link href="/propiedades"
+            className="inline-flex items-center gap-2 bg-white border border-zinc-200 hover:border-rose-400 hover:text-rose-500 text-zinc-600 font-semibold px-8 py-3 rounded-full transition text-sm">
+            Ver todas las propiedades →
+          </Link>
+        </div>
       </section>
 
       {/* FOOTER */}
@@ -304,7 +313,7 @@ export default async function Home() {
             <div>
               <p className="text-2xl font-bold text-rose-400 mb-3">urbix</p>
               <p className="text-sm text-zinc-400 leading-relaxed">
-                El buscador inmobiliario con IA para el interior bonaerense. Encontrá tu próxima propiedad con solo describirla.
+                El buscador inmobiliario con IA que entiende lo que buscás. Encontrá tu próxima propiedad con solo describirla.
               </p>
               <div className="flex gap-3 mt-4">
                 {['I', 'T', 'L'].map(s => (
@@ -326,7 +335,11 @@ export default async function Home() {
               <p className="text-sm font-semibold text-zinc-300 mb-4">Localidades</p>
               <ul className="space-y-2 text-sm text-zinc-500">
                 {['Chivilcoy', 'Mercedes', '25 de Mayo', '9 de Julio', 'Pehuajó', 'Trenque Lauquen', 'Lobos'].map(l => (
-                  <li key={l}><a href="#" className="hover:text-rose-400 transition">{l}</a></li>
+                  <li key={l}>
+                    <Link href={'/localidad/' + encodeURIComponent(l)} className="hover:text-rose-400 transition">
+                      {l}
+                    </Link>
+                  </li>
                 ))}
               </ul>
             </div>
@@ -341,7 +354,7 @@ export default async function Home() {
           </div>
           <div className="border-t border-zinc-800 pt-6 flex flex-col md:flex-row items-center justify-between gap-2">
             <p className="text-xs text-zinc-600">© 2026 Urbix. Todos los derechos reservados.</p>
-            <p className="text-xs text-zinc-600">Interior de la Provincia de Buenos Aires</p>
+            <p className="text-xs text-zinc-600">Argentina</p>
           </div>
         </div>
       </footer>
