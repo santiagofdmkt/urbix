@@ -1,6 +1,7 @@
 // app/page.tsx
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
+import BuscadorHero from './BuscadorHero'
 
 const LOCALIDADES = [
   { nombre: 'Chivilcoy',       cp: 6620 },
@@ -115,7 +116,6 @@ export default async function Home() {
         <p className="text-lg text-zinc-500 max-w-lg mx-auto mb-8">
           Describí lo que buscás con tus palabras. Sin filtros complicados.
         </p>
-
         <div className="max-w-2xl mx-auto">
           <div className="flex justify-center gap-2 mb-4">
             {['Comprar', 'Alquilar'].map((tab, i) => (
@@ -128,25 +128,7 @@ export default async function Home() {
               </button>
             ))}
           </div>
-
-          <div className="bg-white rounded-2xl shadow-xl px-4 py-3 flex items-center gap-3 mb-3">
-            <svg className="w-5 h-5 text-zinc-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-            </svg>
-            <input type="text" placeholder="Ej: casa con jardín, 3 dormitorios, cerca de la plaza..."
-              className="flex-1 text-sm text-zinc-800 outline-none bg-transparent placeholder-zinc-400" />
-            <button className="bg-rose-500 hover:bg-rose-600 text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition">
-              Buscar
-            </button>
-          </div>
-
-          <div className="flex flex-wrap justify-center gap-2">
-            {['Casas', 'Departamentos', 'Terrenos', 'Quintas', 'Locales'].map(f => (
-              <button key={f} className="text-xs px-4 py-1.5 rounded-full border border-zinc-200 bg-white/80 text-zinc-600 hover:border-rose-400 hover:text-rose-500 transition">
-                {f}
-              </button>
-            ))}
-          </div>
+          <BuscadorHero />
         </div>
       </section>
 
