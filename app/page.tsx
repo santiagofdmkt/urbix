@@ -3,51 +3,23 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 
 const LOCALIDADES = [
-  { nombre: 'Chivilcoy', cp: 6620 },
-  { nombre: 'Saliqueló', cp: 6339 },
-  { nombre: 'Tres Lomas', cp: 6409 },
-  { nombre: 'Carlos Tejedor', cp: 6455 },
-  { nombre: 'General Villegas', cp: 6230 },
-  { nombre: 'Ameghino', cp: 6064 },
-  { nombre: 'Rivadavia', cp: 6237 },
-  { nombre: 'General Pinto', cp: 6050 },
-  { nombre: 'Lincoln', cp: 6070 },
-  { nombre: 'Viamonte', cp: 6015 },
-  { nombre: '9 de Julio', cp: 6500 },
-  { nombre: 'Carlos Casares', cp: 6530 },
-  { nombre: 'Bragado', cp: 6640 },
-  { nombre: 'Roque Pérez', cp: 7245 },
-  { nombre: 'Lobos', cp: 7240 },
-  { nombre: 'Navarro', cp: 6605 },
-  { nombre: 'Suipacha', cp: 6612 },
-  { nombre: 'Mercedes', cp: 6600 },
-  { nombre: 'Alberti', cp: 6634 },
-  { nombre: 'América', cp: 6237 },
-  { nombre: 'Pellegrini', cp: 6346 },
-  { nombre: 'Guaminí', cp: 6435 },
-  { nombre: 'Pehuajó', cp: 6450 },
-  { nombre: 'Juan José Paso', cp: 6474 },
+  { nombre: 'Chivilcoy',       cp: 6620 },
+  { nombre: 'Mercedes',        cp: 6600 },
+  { nombre: '25 de Mayo',      cp: 6660 },
+  { nombre: '9 de Julio',      cp: 6500 },
+  { nombre: 'Pehuajó',         cp: 6450 },
   { nombre: 'Trenque Lauquen', cp: 6400 },
-  { nombre: 'Los Toldos', cp: 6015 },
-  { nombre: 'Pintos', cp: 6050 },
-  { nombre: '25 de Mayo', cp: 6660 },
-  { nombre: '30 de Agosto', cp: 6405 },
-  { nombre: 'Garré', cp: 6411 },
-  { nombre: 'Casbas', cp: 6417 },
+  { nombre: 'Lobos',           cp: 7240 },
 ]
 
-// Fotos de referencia por ciudad (Unsplash genéricas de pueblos bonaerenses)
 const FOTOS_LOCALIDADES: Record<string, string> = {
-  'Chivilcoy': 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400&q=80',
-  'Lincoln': 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&q=80',
-  'Mercedes': 'https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=400&q=80',
-  'Bragado': 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&q=80',
-  '9 de Julio': 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&q=80',
+  'Chivilcoy':       'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400&q=80',
+  'Mercedes':        'https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=400&q=80',
+  '25 de Mayo':      'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=400&q=80',
+  '9 de Julio':      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&q=80',
+  'Pehuajó':         'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80',
   'Trenque Lauquen': 'https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=400&q=80',
-  'Pehuajó': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80',
-  'Carlos Casares': 'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=400&q=80',
-  'General Villegas': 'https://images.unsplash.com/photo-1494526585095-c41746248156?w=400&q=80',
-  '25 de Mayo': 'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=400&q=80',
+  'Lobos':           'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&q=80',
 }
 
 const DEFAULT_FOTO = 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&q=80'
@@ -78,7 +50,6 @@ export default async function Home() {
     return countImgs(b) - countImgs(a)
   })
 
-  // Contar propiedades por ciudad
   const { data: porCiudad } = await supabase
     .from('propiedades')
     .select('ciudad')
@@ -119,7 +90,7 @@ export default async function Home() {
           <nav className="hidden md:flex items-center gap-6 text-sm">
             <Link href="#comprar" className="text-zinc-500 hover:text-zinc-800 transition">Comprar</Link>
             <Link href="#alquilar" className="text-zinc-500 hover:text-zinc-800 transition">Alquilar</Link>
-            <Link href="#" className="text-zinc-500 hover:text-zinc-800 transition font-medium">Soy inmobiliaria</Link>
+            <Link href="/soy-inmobiliaria" className="text-zinc-500 hover:text-zinc-800 transition font-medium">Soy inmobiliaria</Link>
           </nav>
           <div className="flex items-center gap-3">
             <button className="text-sm text-zinc-600 hover:text-zinc-900 transition font-medium">Iniciar sesión</button>
@@ -133,7 +104,7 @@ export default async function Home() {
         </div>
       </header>
 
-      {/* HERO con solapas Comprar / Alquilar */}
+      {/* HERO */}
       <section className="relative py-20 px-6 text-center overflow-hidden"
         style={{ background: "linear-gradient(135deg, #fff1f2 0%, #fce7f3 50%, #ede9fe 100%)" }}>
         <p className="text-xs font-bold tracking-widest text-rose-400 uppercase mb-4">Buscador inmobiliario con IA</p>
@@ -145,7 +116,6 @@ export default async function Home() {
           Describí lo que buscás con tus palabras. Sin filtros complicados.
         </p>
 
-        {/* Solapas */}
         <div className="max-w-2xl mx-auto">
           <div className="flex justify-center gap-2 mb-4">
             {['Comprar', 'Alquilar'].map((tab, i) => (
@@ -170,7 +140,6 @@ export default async function Home() {
             </button>
           </div>
 
-          {/* Filtros rápidos por tipo */}
           <div className="flex flex-wrap justify-center gap-2">
             {['Casas', 'Departamentos', 'Terrenos', 'Quintas', 'Locales'].map(f => (
               <button key={f} className="text-xs px-4 py-1.5 rounded-full border border-zinc-200 bg-white/80 text-zinc-600 hover:border-rose-400 hover:text-rose-500 transition">
@@ -186,9 +155,9 @@ export default async function Home() {
         <div className="max-w-4xl mx-auto flex justify-center gap-16">
           {[
             { num: `${total}+`, label: "Propiedades disponibles" },
-            { num: "31", label: "Localidades del interior" },
-            { num: "IA", label: "Búsqueda inteligente" },
-            { num: "100%", label: "Gratis para buscar" },
+            { num: "7",         label: "Localidades del interior" },
+            { num: "IA",        label: "Búsqueda inteligente" },
+            { num: "100%",      label: "Gratis para buscar" },
           ].map(s => (
             <div key={s.label} className="text-center">
               <p className="text-2xl font-bold text-rose-500">{s.num}</p>
@@ -204,11 +173,11 @@ export default async function Home() {
         <h2 className="text-2xl font-bold text-zinc-900 mb-5">Encontrá lo que buscás</h2>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           {[
-            { label: 'Casas', icon: '🏠', desc: 'En venta' },
+            { label: 'Casas',         icon: '🏠', desc: 'En venta' },
             { label: 'Departamentos', icon: '🏢', desc: 'Deptos y PHs' },
-            { label: 'Terrenos', icon: '🌿', desc: 'Lotes y terrenos' },
-            { label: 'Quintas', icon: '🏡', desc: 'Casas quinta' },
-            { label: 'Locales', icon: '🏪', desc: 'Comerciales' },
+            { label: 'Terrenos',      icon: '🌿', desc: 'Lotes y terrenos' },
+            { label: 'Quintas',       icon: '🏡', desc: 'Casas quinta' },
+            { label: 'Locales',       icon: '🏪', desc: 'Comerciales' },
           ].map(cat => (
             <button key={cat.label} className="bg-white rounded-2xl p-4 text-left border border-zinc-100 hover:border-rose-300 hover:shadow-md transition group">
               <span className="text-3xl mb-2 block">{cat.icon}</span>
@@ -256,12 +225,12 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* LOCALIDADES — grilla con foto */}
+      {/* LOCALIDADES */}
       <section className="bg-zinc-50 py-12">
         <div className="max-w-7xl mx-auto px-6">
           <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Cobertura regional</p>
           <h2 className="text-2xl font-bold text-zinc-900 mb-6">Propiedades en el interior bonaerense</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
             {LOCALIDADES.map(loc => {
               const cant = conteoXCiudad[loc.nombre] || 0
               const tiene = cant > 0
@@ -356,7 +325,7 @@ export default async function Home() {
             <div>
               <p className="text-sm font-semibold text-zinc-300 mb-4">Localidades</p>
               <ul className="space-y-2 text-sm text-zinc-500">
-                {['Chivilcoy', 'Mercedes', 'Lincoln', 'Bragado', '9 de Julio', 'Trenque Lauquen'].map(l => (
+                {['Chivilcoy', 'Mercedes', '25 de Mayo', '9 de Julio', 'Pehuajó', 'Trenque Lauquen', 'Lobos'].map(l => (
                   <li key={l}><a href="#" className="hover:text-rose-400 transition">{l}</a></li>
                 ))}
               </ul>
