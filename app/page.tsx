@@ -172,8 +172,11 @@ export default async function Home() {
               </svg>
             </button>
           </div>
-          {/* Mobile: solo botón registrarse */}
+          {/* Mobile */}
           <div className="flex md:hidden items-center gap-2">
+            <Link href="/soy-inmobiliaria" className="text-xs font-semibold text-zinc-600 hover:text-rose-500 transition">
+              Soy inmobiliaria
+            </Link>
             <button className="bg-rose-500 text-white text-xs font-semibold px-3 py-1.5 rounded-full">Registrarse</button>
           </div>
         </div>
