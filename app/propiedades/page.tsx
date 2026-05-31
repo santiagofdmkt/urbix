@@ -6,6 +6,7 @@ export default async function PropiedadesPage() {
     .from('propiedades')
     .select('*')
     .eq('activo', true)
+    .not('imagenes', 'is', null)
     .order('created_at', { ascending: false })
 
   const propiedades = (raw || []).sort((a, b) => {
@@ -29,6 +30,7 @@ export default async function PropiedadesPage() {
   const parseImg = (imagenes: any): string | null => {
     try {
       if (!imagenes) return null
+      if (typeof imagenes === 'string' && imagenes.startsWith('http')) return imagenes
       const arr = typeof imagenes === 'string' ? JSON.parse(imagenes) : imagenes
       if (!Array.isArray(arr)) return null
       return arr.find((s: string) => s.includes('supabase.co')) || arr[0] || null
@@ -88,13 +90,13 @@ export default async function PropiedadesPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {propiedades.map(p => {
             const img = parseImg(p.imagenes)
-            const imgSrc = img || 'https://placehold.co/600x400?text=Sin+foto'
+            if (!img) return null
             const titulo = getTitulo(p.titulo)
             return (
               <Link key={p.id} href={'/propiedad/' + p.id}
                 className="group block bg-white rounded-2xl overflow-hidden border border-zinc-100 hover:shadow-lg transition">
                 <div className="relative h-52 bg-zinc-100 overflow-hidden">
-                  <img src={imgSrc} alt={titulo} className="w-full h-full object-cover group-hover:scale-105 transition duration-500"/>
+                  <img src={img} alt={titulo} className="w-full h-full object-cover group-hover:scale-105 transition duration-500"/>
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
                     <p className="text-white font-bold text-lg">{p.moneda} {p.precio?.toLocaleString('es-AR')}</p>
                   </div>
