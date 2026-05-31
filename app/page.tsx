@@ -23,7 +23,75 @@ const FOTOS_LOCALIDADES: Record<string, string> = {
   'Lobos':           'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&q=80',
 }
 
+// Fotos para zonas próximamente
+const FOTOS_PROXIMAMENTE: Record<string, string> = {
+  // CABA
+  'Palermo':        'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400&q=80',
+  'Belgrano':       'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?w=400&q=80',
+  'Recoleta':       'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&q=80',
+  'Caballito':      'https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=400&q=80',
+  'San Telmo':      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&q=80',
+  'Puerto Madero':  'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&q=80',
+  'Almagro':        'https://images.unsplash.com/photo-1576941089067-2de3c901e126?w=400&q=80',
+  // Costa Atlántica
+  'Mar del Plata':  'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80',
+  'Pinamar':        'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=400&q=80',
+  'Villa Gesell':   'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&q=80',
+  'Miramar':        'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?w=400&q=80',
+  'Necochea':       'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80',
+  'Monte Hermoso':  'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&q=80',
+  'Bahía Blanca':   'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400&q=80',
+  // Córdoba
+  'Córdoba Capital':   'https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=400&q=80',
+  'Villa Carlos Paz':  'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&q=80',
+  'Río Cuarto':        'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=400&q=80',
+  'Alta Gracia':       'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&q=80',
+  'Villa María':       'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80',
+  'Cosquín':           'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=400&q=80',
+  'La Falda':          'https://images.unsplash.com/photo-1448375240586-882707db888b?w=400&q=80',
+  // Santa Fe
+  'Rosario':           'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400&q=80',
+  'Santa Fe Capital':  'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?w=400&q=80',
+  'Rafaela':           'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&q=80',
+  'Venado Tuerto':     'https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=400&q=80',
+  'Reconquista':       'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&q=80',
+  'San Lorenzo':       'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&q=80',
+  'Esperanza':         'https://images.unsplash.com/photo-1576941089067-2de3c901e126?w=400&q=80',
+  // La Pampa
+  'Santa Rosa':        'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400&q=80',
+  'General Pico':      'https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=400&q=80',
+  'Toay':              'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=400&q=80',
+  'Realicó':           'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&q=80',
+  'General Acha':      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80',
+  'Eduardo Castex':    'https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=400&q=80',
+  'Victorica':         'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&q=80',
+}
+
 const DEFAULT_FOTO = 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&q=80'
+
+function ProximamenteGrid({ items }: { items: string[] }) {
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+      {items.map(loc => {
+        const foto = FOTOS_PROXIMAMENTE[loc] || DEFAULT_FOTO
+        return (
+          <div key={loc} className="relative rounded-2xl overflow-hidden opacity-80 cursor-default">
+            <div className="h-28 relative">
+              <img src={foto} alt={loc} className="w-full h-full object-cover grayscale" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/20" />
+              <div className="absolute top-2 right-2 bg-zinc-700/80 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                Próximamente
+              </div>
+            </div>
+            <div className="absolute bottom-0 left-0 right-0 p-2">
+              <p className="text-white text-xs font-semibold leading-tight">{loc}</p>
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
 
 export default async function Home() {
   const { data: raw } = await supabase
@@ -82,18 +150,20 @@ export default async function Home() {
   const recientes = propiedades.slice(0, 9)
 
   return (
-    <div className="min-h-screen bg-white font-sans">
+    <div className="min-h-screen bg-white font-sans w-full overflow-x-hidden">
 
       {/* NAV */}
-      <header className="bg-white border-b border-zinc-100 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold text-rose-500 tracking-tight">urbix</Link>
+      <header className="bg-white border-b border-zinc-100 sticky top-0 z-50 w-full">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+          <Link href="/" className="text-2xl font-bold text-rose-500 tracking-tight shrink-0">urbix</Link>
+          {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-6 text-sm">
             <Link href="#comprar" className="text-zinc-500 hover:text-zinc-800 transition">Comprar</Link>
             <Link href="#alquilar" className="text-zinc-500 hover:text-zinc-800 transition">Alquilar</Link>
             <Link href="/soy-inmobiliaria" className="text-zinc-500 hover:text-zinc-800 transition font-medium">Soy inmobiliaria</Link>
           </nav>
-          <div className="flex items-center gap-3">
+          {/* Desktop buttons */}
+          <div className="hidden md:flex items-center gap-3">
             <button className="text-sm text-zinc-600 hover:text-zinc-900 transition font-medium">Iniciar sesión</button>
             <button className="bg-rose-500 hover:bg-rose-600 text-white text-sm font-semibold px-4 py-2 rounded-full transition">Registrarse</button>
             <button className="w-9 h-9 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center transition">
@@ -102,21 +172,25 @@ export default async function Home() {
               </svg>
             </button>
           </div>
+          {/* Mobile: solo botón registrarse */}
+          <div className="flex md:hidden items-center gap-2">
+            <button className="bg-rose-500 text-white text-xs font-semibold px-3 py-1.5 rounded-full">Registrarse</button>
+          </div>
         </div>
       </header>
 
       {/* HERO */}
-      <section className="relative py-20 px-6 text-center overflow-hidden"
+      <section className="relative py-12 md:py-20 px-4 text-center overflow-hidden w-full"
         style={{ background: "linear-gradient(135deg, #fff1f2 0%, #fce7f3 50%, #ede9fe 100%)" }}>
         <p className="text-xs font-bold tracking-widest text-rose-400 uppercase mb-4">Buscador inmobiliario con IA</p>
-        <h1 className="text-5xl md:text-6xl font-bold text-zinc-900 leading-tight mb-3">
+        <h1 className="text-4xl md:text-6xl font-bold text-zinc-900 leading-tight mb-3">
           Buscá propiedades<br />
           <span className="text-rose-500 italic">como te las imaginás</span>
         </h1>
-        <p className="text-lg text-zinc-500 max-w-lg mx-auto mb-8">
+        <p className="text-base md:text-lg text-zinc-500 max-w-lg mx-auto mb-8">
           Describí lo que buscás con tus palabras. Sin filtros complicados.
         </p>
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-2xl mx-auto w-full">
           <div className="flex justify-center gap-2 mb-4">
             {['Comprar', 'Alquilar'].map((tab, i) => (
               <button key={tab} className={`px-6 py-2 rounded-full text-sm font-semibold transition border ${
@@ -133,8 +207,8 @@ export default async function Home() {
       </section>
 
       {/* STATS */}
-      <section className="border-b border-zinc-100 py-6">
-        <div className="max-w-4xl mx-auto flex justify-center gap-16">
+      <section className="border-b border-zinc-100 py-6 w-full overflow-x-hidden">
+        <div className="max-w-4xl mx-auto px-4 grid grid-cols-2 md:flex md:justify-center gap-6 md:gap-16">
           {[
             { num: `${total}+`, label: "Propiedades disponibles" },
             { num: "7",         label: "Localidades del interior" },
@@ -150,7 +224,7 @@ export default async function Home() {
       </section>
 
       {/* EXPLORAR POR TIPO */}
-      <section className="max-w-7xl mx-auto px-6 py-10">
+      <section className="max-w-7xl mx-auto px-4 py-10 w-full">
         <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Explorá por categoría</p>
         <h2 className="text-2xl font-bold text-zinc-900 mb-5">Encontrá lo que buscás</h2>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
@@ -171,13 +245,13 @@ export default async function Home() {
       </section>
 
       {/* PROPIEDADES DESTACADAS */}
-      <section id="comprar" className="max-w-7xl mx-auto px-6 py-10">
+      <section id="comprar" className="max-w-7xl mx-auto px-4 py-10 w-full">
         <div className="flex items-center justify-between mb-5">
           <div>
             <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Nuevas y destacadas</p>
             <h2 className="text-2xl font-bold text-zinc-900">Lo último disponible</h2>
           </div>
-          <Link href="/propiedades" className="text-sm text-rose-500 hover:underline font-medium">Ver más →</Link>
+          <Link href="/propiedades" className="text-sm text-rose-500 hover:underline font-medium shrink-0">Ver más →</Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {destacadas.map(p => {
@@ -207,12 +281,15 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* LOCALIDADES */}
-      <section className="bg-zinc-50 py-12">
-        <div className="max-w-7xl mx-auto px-6">
+      {/* LOCALIDADES POR ZONA */}
+      <section className="bg-zinc-50 py-12 w-full overflow-x-hidden">
+        <div className="max-w-7xl mx-auto px-4">
           <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Cobertura regional</p>
-          <h2 className="text-2xl font-bold text-zinc-900 mb-6">Propiedades en el interior bonaerense</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+          <h2 className="text-2xl font-bold text-zinc-900 mb-8">Propiedades por zona</h2>
+
+          {/* Provincia de Buenos Aires */}
+          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Provincia de Buenos Aires</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-10">
             {LOCALIDADES.map(loc => {
               const cant = conteoXCiudad[loc.nombre] || 0
               const tiene = cant > 0
@@ -243,11 +320,40 @@ export default async function Home() {
               )
             })}
           </div>
+
+          {/* Ciudad Autónoma de Buenos Aires */}
+          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Ciudad Autónoma de Buenos Aires</p>
+          <div className="mb-10">
+            <ProximamenteGrid items={['Palermo', 'Belgrano', 'Recoleta', 'Caballito', 'San Telmo', 'Puerto Madero', 'Almagro']} />
+          </div>
+
+          {/* Costa Atlántica */}
+          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Costa Atlántica</p>
+          <div className="mb-10">
+            <ProximamenteGrid items={['Mar del Plata', 'Pinamar', 'Villa Gesell', 'Miramar', 'Necochea', 'Monte Hermoso', 'Bahía Blanca']} />
+          </div>
+
+          {/* Córdoba */}
+          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Córdoba</p>
+          <div className="mb-10">
+            <ProximamenteGrid items={['Córdoba Capital', 'Villa Carlos Paz', 'Río Cuarto', 'Alta Gracia', 'Villa María', 'Cosquín', 'La Falda']} />
+          </div>
+
+          {/* Santa Fe */}
+          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Santa Fe</p>
+          <div className="mb-10">
+            <ProximamenteGrid items={['Rosario', 'Santa Fe Capital', 'Rafaela', 'Venado Tuerto', 'Reconquista', 'San Lorenzo', 'Esperanza']} />
+          </div>
+
+          {/* La Pampa */}
+          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">La Pampa</p>
+          <ProximamenteGrid items={['Santa Rosa', 'General Pico', 'Toay', 'Realicó', 'General Acha', 'Eduardo Castex', 'Victorica']} />
+
         </div>
       </section>
 
       {/* PROPIEDADES RECIENTES */}
-      <section id="todas" className="max-w-7xl mx-auto px-6 py-12">
+      <section id="todas" className="max-w-7xl mx-auto px-4 py-12 w-full">
         <div className="flex items-center justify-between mb-6">
           <div>
             <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Propiedades recientes</p>
@@ -289,13 +395,13 @@ export default async function Home() {
       </section>
 
       {/* FOOTER */}
-      <footer className="bg-zinc-900 text-white pt-16 pb-8">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
-            <div>
+      <footer className="bg-zinc-900 text-white pt-16 pb-8 w-full">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+            <div className="col-span-2 md:col-span-1">
               <p className="text-2xl font-bold text-rose-400 mb-3">urbix</p>
               <p className="text-sm text-zinc-400 leading-relaxed">
-                El buscador inmobiliario con IA que entiende lo que buscás. Encontrá tu próxima propiedad con solo describirla.
+                El buscador inmobiliario con IA que entiende lo que buscás.
               </p>
               <div className="flex gap-3 mt-4">
                 {['I', 'T', 'L'].map(s => (
