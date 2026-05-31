@@ -23,9 +23,7 @@ const FOTOS_LOCALIDADES: Record<string, string> = {
   'Lobos':           'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&q=80',
 }
 
-// Fotos para zonas próximamente
 const FOTOS_PROXIMAMENTE: Record<string, string> = {
-  // CABA
   'Palermo':        'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400&q=80',
   'Belgrano':       'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?w=400&q=80',
   'Recoleta':       'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&q=80',
@@ -33,7 +31,6 @@ const FOTOS_PROXIMAMENTE: Record<string, string> = {
   'San Telmo':      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&q=80',
   'Puerto Madero':  'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&q=80',
   'Almagro':        'https://images.unsplash.com/photo-1576941089067-2de3c901e126?w=400&q=80',
-  // Costa Atlántica
   'Mar del Plata':  'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80',
   'Pinamar':        'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=400&q=80',
   'Villa Gesell':   'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&q=80',
@@ -41,7 +38,6 @@ const FOTOS_PROXIMAMENTE: Record<string, string> = {
   'Necochea':       'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80',
   'Monte Hermoso':  'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&q=80',
   'Bahía Blanca':   'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400&q=80',
-  // Córdoba
   'Córdoba Capital':   'https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=400&q=80',
   'Villa Carlos Paz':  'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&q=80',
   'Río Cuarto':        'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=400&q=80',
@@ -49,7 +45,6 @@ const FOTOS_PROXIMAMENTE: Record<string, string> = {
   'Villa María':       'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80',
   'Cosquín':           'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=400&q=80',
   'La Falda':          'https://images.unsplash.com/photo-1448375240586-882707db888b?w=400&q=80',
-  // Santa Fe
   'Rosario':           'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400&q=80',
   'Santa Fe Capital':  'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?w=400&q=80',
   'Rafaela':           'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&q=80',
@@ -57,7 +52,6 @@ const FOTOS_PROXIMAMENTE: Record<string, string> = {
   'Reconquista':       'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&q=80',
   'San Lorenzo':       'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&q=80',
   'Esperanza':         'https://images.unsplash.com/photo-1576941089067-2de3c901e126?w=400&q=80',
-  // La Pampa
   'Santa Rosa':        'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400&q=80',
   'General Pico':      'https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=400&q=80',
   'Toay':              'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=400&q=80',
@@ -164,20 +158,20 @@ export default async function Home() {
           </nav>
           {/* Desktop buttons */}
           <div className="hidden md:flex items-center gap-3">
-            <button className="text-sm text-zinc-600 hover:text-zinc-900 transition font-medium">Iniciar sesión</button>
-            <button className="bg-rose-500 hover:bg-rose-600 text-white text-sm font-semibold px-4 py-2 rounded-full transition">Registrarse</button>
-            <button className="w-9 h-9 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center transition">
+            <Link href="/login" className="text-sm text-zinc-600 hover:text-zinc-900 transition font-medium">Iniciar sesión</Link>
+            <Link href="/registro" className="bg-rose-500 hover:bg-rose-600 text-white text-sm font-semibold px-4 py-2 rounded-full transition">Registrarse</Link>
+            <Link href="/perfil" className="w-9 h-9 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center transition">
               <svg className="w-5 h-5 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
               </svg>
-            </button>
+            </Link>
           </div>
           {/* Mobile */}
           <div className="flex md:hidden items-center gap-2">
             <Link href="/soy-inmobiliaria" className="text-xs font-semibold text-zinc-600 hover:text-rose-500 transition">
               Soy inmobiliaria
             </Link>
-            <button className="bg-rose-500 text-white text-xs font-semibold px-3 py-1.5 rounded-full">Registrarse</button>
+            <Link href="/registro" className="bg-rose-500 text-white text-xs font-semibold px-3 py-1.5 rounded-full">Registrarse</Link>
           </div>
         </div>
       </header>
@@ -290,7 +284,6 @@ export default async function Home() {
           <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Cobertura regional</p>
           <h2 className="text-2xl font-bold text-zinc-900 mb-8">Propiedades por zona</h2>
 
-          {/* Provincia de Buenos Aires */}
           <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Provincia de Buenos Aires</p>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-10">
             {LOCALIDADES.map(loc => {
@@ -324,34 +317,28 @@ export default async function Home() {
             })}
           </div>
 
-          {/* Ciudad Autónoma de Buenos Aires */}
           <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Ciudad Autónoma de Buenos Aires</p>
           <div className="mb-10">
             <ProximamenteGrid items={['Palermo', 'Belgrano', 'Recoleta', 'Caballito', 'San Telmo', 'Puerto Madero', 'Almagro']} />
           </div>
 
-          {/* Costa Atlántica */}
           <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Costa Atlántica</p>
           <div className="mb-10">
             <ProximamenteGrid items={['Mar del Plata', 'Pinamar', 'Villa Gesell', 'Miramar', 'Necochea', 'Monte Hermoso', 'Bahía Blanca']} />
           </div>
 
-          {/* Córdoba */}
           <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Córdoba</p>
           <div className="mb-10">
             <ProximamenteGrid items={['Córdoba Capital', 'Villa Carlos Paz', 'Río Cuarto', 'Alta Gracia', 'Villa María', 'Cosquín', 'La Falda']} />
           </div>
 
-          {/* Santa Fe */}
           <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Santa Fe</p>
           <div className="mb-10">
             <ProximamenteGrid items={['Rosario', 'Santa Fe Capital', 'Rafaela', 'Venado Tuerto', 'Reconquista', 'San Lorenzo', 'Esperanza']} />
           </div>
 
-          {/* La Pampa */}
           <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">La Pampa</p>
           <ProximamenteGrid items={['Santa Rosa', 'General Pico', 'Toay', 'Realicó', 'General Acha', 'Eduardo Castex', 'Victorica']} />
-
         </div>
       </section>
 

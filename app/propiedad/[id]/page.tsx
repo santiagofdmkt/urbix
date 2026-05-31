@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import Link from "next/link"
 import GaleriaConLightbox from "./GaleriaConLightbox"
 import FormularioContacto from "./FormularioContacto"
+import BotonFavorito from "./BotonFavorito"
 
 export default async function PropiedadDetalle({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -108,9 +109,10 @@ export default async function PropiedadDetalle({ params }: { params: Promise<{ i
         <div className="mb-6">
           <div className="flex flex-wrap items-start justify-between gap-4 mb-2">
             <h1 className="text-2xl md:text-3xl font-bold text-zinc-900 leading-snug max-w-3xl">{tituloCorto}</h1>
-            <div className="text-right shrink-0">
+            <div className="flex flex-col items-end gap-2 shrink-0">
               <p className="text-3xl font-bold text-rose-500">{p.moneda} {p.precio?.toLocaleString('es-AR')}</p>
-              {precioM2 && <p className="text-xs text-zinc-400 mt-0.5">{p.moneda} {precioM2.toLocaleString('es-AR')}/m²</p>}
+              {precioM2 && <p className="text-xs text-zinc-400">{p.moneda} {precioM2.toLocaleString('es-AR')}/m²</p>}
+              <BotonFavorito propiedadId={String(p.id)} />
             </div>
           </div>
           <div className="flex items-center gap-1.5 text-zinc-400 text-sm">
@@ -126,13 +128,12 @@ export default async function PropiedadDetalle({ params }: { params: Promise<{ i
           <GaleriaConLightbox imgs={imgs} titulo={tituloCorto} />
         </div>
 
-        {/* LAYOUT PRINCIPAL: contenido + sidebar */}
+        {/* LAYOUT PRINCIPAL */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
           {/* COLUMNA IZQUIERDA */}
           <div className="lg:col-span-2 space-y-6">
 
-            {/* FICHA TÉCNICA */}
             {fichaItems.length > 0 && (
               <div className="bg-white rounded-2xl border border-zinc-100 p-6">
                 <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-4">Detalles de la propiedad</h2>
@@ -152,7 +153,6 @@ export default async function PropiedadDetalle({ params }: { params: Promise<{ i
               </div>
             )}
 
-            {/* CARACTERÍSTICAS */}
             {tags.length > 0 && (
               <div className="bg-white rounded-2xl border border-zinc-100 p-6">
                 <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-4">Características</h2>
@@ -166,13 +166,11 @@ export default async function PropiedadDetalle({ params }: { params: Promise<{ i
               </div>
             )}
 
-            {/* DESCRIPCIÓN */}
             <div className="bg-white rounded-2xl border border-zinc-100 p-6">
               <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-4">Descripción</h2>
               <p className="text-zinc-600 text-sm leading-relaxed whitespace-pre-line">{descripcion}</p>
             </div>
 
-            {/* BOTÓN WHATSAPP */}
             {waUrl && (
               <a href={waUrl} target="_blank" rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-3.5 rounded-2xl transition text-sm w-full">
@@ -185,17 +183,10 @@ export default async function PropiedadDetalle({ params }: { params: Promise<{ i
 
           </div>
 
-          {/* SIDEBAR DERECHO */}
+          {/* SIDEBAR */}
           <div className="space-y-4">
             <div className="sticky top-20">
-
-              {/* FORMULARIO */}
-              <FormularioContacto
-                propiedadId={String(p.id)}
-                propiedadTitulo={tituloCorto}
-              />
-
-              {/* CTA INMOBILIARIA */}
+              <FormularioContacto propiedadId={String(p.id)} propiedadTitulo={tituloCorto} />
               <div className="mt-4 bg-rose-50 border border-rose-100 rounded-2xl p-4">
                 <p className="text-sm text-rose-500 font-semibold mb-1">¿Sos de esta inmobiliaria?</p>
                 <p className="text-xs text-zinc-500 mb-3">Registrate y publicá tus propiedades en Urbix.</p>
@@ -204,14 +195,11 @@ export default async function PropiedadDetalle({ params }: { params: Promise<{ i
                   Registrar mi inmobiliaria
                 </Link>
               </div>
-
-              {/* AVISO LEGAL */}
               <div className="mt-4 bg-zinc-50 rounded-xl p-4">
                 <p className="text-xs text-zinc-400 leading-relaxed">
                   La información es de carácter informativo. Verificá siempre los datos con el propietario o representante antes de tomar decisiones.
                 </p>
               </div>
-
             </div>
           </div>
         </div>
@@ -237,9 +225,7 @@ export default async function PropiedadDetalle({ params }: { params: Promise<{ i
                       <img src={img} alt={tit} className="w-full h-full object-cover group-hover:scale-105 transition duration-500"/>
                     </div>
                     <div className="p-4">
-                      <p className="text-sm font-bold text-rose-500 mb-1">
-                        {s.moneda} {s.precio?.toLocaleString('es-AR')}
-                      </p>
+                      <p className="text-sm font-bold text-rose-500 mb-1">{s.moneda} {s.precio?.toLocaleString('es-AR')}</p>
                       <p className="text-xs text-zinc-700 font-medium line-clamp-2 mb-1">{tit}</p>
                       <p className="text-xs text-zinc-400">{s.ciudad}</p>
                     </div>
