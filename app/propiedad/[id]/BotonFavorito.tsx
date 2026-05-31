@@ -46,7 +46,7 @@ export default function BotonFavorito({ propiedadId }: { propiedadId: string }) 
     <button
       onClick={toggle}
       disabled={loading}
-      className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border transition text-sm font-medium ${
+      className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border transition text-sm font-medium cursor-pointer ${
         guardado
           ? 'bg-rose-50 border-rose-200 text-rose-500'
           : 'bg-white border-zinc-200 text-zinc-500 hover:border-rose-300 hover:text-rose-400'

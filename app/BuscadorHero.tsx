@@ -47,4 +47,4 @@ export default function BuscadorHero() {
       </div>
     </div>
   )
-}
+} 
