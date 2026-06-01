@@ -18,7 +18,7 @@ const FOTOS_LOCALIDADES: Record<string, string> = {
   'Mercedes':        'https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=400&q=80',
   '25 de Mayo':      'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=400&q=80',
   '9 de Julio':      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&q=80',
-  'Pehuajó':         'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80',
+  'Pehuajó': 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&q=80',
   'Trenque Lauquen': 'https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=400&q=80',
   'Lobos':           'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&q=80',
 }
@@ -150,13 +150,11 @@ export default async function Home() {
       <header className="bg-white border-b border-zinc-100 sticky top-0 z-50 w-full">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link href="/" className="text-2xl font-bold text-rose-500 tracking-tight shrink-0">urbix</Link>
-          {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-6 text-sm">
             <Link href="#comprar" className="text-zinc-500 hover:text-zinc-800 transition">Comprar</Link>
             <Link href="#alquilar" className="text-zinc-500 hover:text-zinc-800 transition">Alquilar</Link>
             <Link href="/soy-inmobiliaria" className="text-zinc-500 hover:text-zinc-800 transition font-medium">Soy inmobiliaria</Link>
           </nav>
-          {/* Desktop buttons */}
           <div className="hidden md:flex items-center gap-3">
             <Link href="/login" className="text-sm text-zinc-600 hover:text-zinc-900 transition font-medium">Iniciar sesión</Link>
             <Link href="/registro" className="bg-rose-500 hover:bg-rose-600 text-white text-sm font-semibold px-4 py-2 rounded-full transition">Registrarse</Link>
@@ -166,7 +164,6 @@ export default async function Home() {
               </svg>
             </Link>
           </div>
-          {/* Mobile */}
           <div className="flex md:hidden items-center gap-2">
             <Link href="/soy-inmobiliaria" className="text-xs font-semibold text-zinc-600 hover:text-rose-500 transition">
               Soy inmobiliaria
@@ -381,6 +378,64 @@ export default async function Home() {
             className="inline-flex items-center gap-2 bg-white border border-zinc-200 hover:border-rose-400 hover:text-rose-500 text-zinc-600 font-semibold px-8 py-3 rounded-full transition text-sm">
             Ver todas las propiedades →
           </Link>
+        </div>
+      </section>
+
+      {/* EXPLORÁ POR LOCALIDAD */}
+      <section className="bg-gradient-to-br from-rose-50 to-white py-16 w-full">
+        <div className="max-w-7xl mx-auto px-4">
+          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Dónde encontramos propiedades</p>
+          <h2 className="text-2xl font-bold text-zinc-900 mb-2">Explorá por localidad</h2>
+          <p className="text-sm text-zinc-400 mb-8 max-w-lg">
+            Cobertura real en el interior bonaerense. Hacé clic en tu ciudad para ver todas las propiedades disponibles.
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {LOCALIDADES.map(loc => {
+              const cant = conteoXCiudad[loc.nombre] || 0
+              const foto = FOTOS_LOCALIDADES[loc.nombre] || DEFAULT_FOTO
+              const tiene = cant > 0
+              return (
+                <Link
+                  key={loc.nombre}
+                  href={tiene ? '/localidad/' + encodeURIComponent(loc.nombre) : '#'}
+                  className={`group relative rounded-3xl overflow-hidden block ${tiene ? 'hover:shadow-xl' : 'opacity-50 pointer-events-none'} transition-all duration-300`}
+                >
+                  <div className="h-48 md:h-56 relative overflow-hidden">
+                    <img
+                      src={foto}
+                      alt={loc.nombre}
+                      className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  </div>
+                  {tiene && (
+                    <div className="absolute top-3 right-3 bg-rose-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg">
+                      {cant} prop.
+                    </div>
+                  )}
+                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <p className="text-white font-bold text-lg leading-tight">{loc.nombre}</p>
+                    <p className="text-rose-200 text-xs mt-0.5 font-medium">
+                      {tiene ? 'Ver propiedades →' : 'Próximamente'}
+                    </p>
+                  </div>
+                </Link>
+              )
+            })}
+
+            {/* Tarjeta CTA */}
+            <div className="relative rounded-3xl overflow-hidden bg-rose-500 flex flex-col items-center justify-center p-6 text-center min-h-[192px] md:min-h-[224px]">
+              <div className="text-4xl mb-3">📍</div>
+              <p className="text-white font-bold text-base leading-snug mb-1">¿Tu ciudad no está?</p>
+              <p className="text-rose-100 text-xs mb-4">Estamos expandiéndonos. Avisanos y la sumamos.</p>
+              <Link
+                href="/contacto"
+                className="bg-white text-rose-500 text-xs font-bold px-4 py-2 rounded-full hover:bg-rose-50 transition"
+              >
+                Sugerir ciudad
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
