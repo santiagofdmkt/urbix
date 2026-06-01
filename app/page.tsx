@@ -258,7 +258,7 @@ export default async function Home() {
                 { icon: '📩', title: 'Leads directos', desc: 'El comprador te contacta a vos, sin intermediarios.' },
                 { icon: '🤝', title: 'Sin ataduras',   desc: 'Sin contrato largo — arrancás y parás cuando querés.' },
                 { icon: '📊', title: 'Visibilidad real', desc: 'Sabés exactamente cuánta gente ve tus propiedades.' },
-                { icon: '🏙️', title: 'Foco en el interior', desc: 'Portal diseñado para el interior bonaerense, no para CABA.' },
+                { icon: '🏙️', title: 'Presente en todo el país', desc: 'Tu ciudad tiene su lugar, sin importar donde estés.' },
               ].map(item => (
                 <li key={item.title} className="flex items-start gap-4">
                   <div className="w-11 h-11 rounded-2xl bg-white border border-rose-100 shadow-sm flex items-center justify-center text-xl shrink-0">
@@ -332,27 +332,6 @@ export default async function Home() {
         </div>
       </section>
 
-
-      {/* EXPLORAR POR TIPO */}
-      <section className="max-w-7xl mx-auto px-4 py-10 w-full">
-        <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Explorá por categoría</p>
-        <h2 className="text-2xl font-bold text-zinc-900 mb-5">Encontrá lo que buscás</h2>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-          {[
-            { label: 'Casas',         icon: '🏠', desc: 'En venta' },
-            { label: 'Departamentos', icon: '🏢', desc: 'Deptos y PHs' },
-            { label: 'Terrenos',      icon: '🌿', desc: 'Lotes y terrenos' },
-            { label: 'Quintas',       icon: '🏡', desc: 'Casas quinta' },
-            { label: 'Locales',       icon: '🏪', desc: 'Comerciales' },
-          ].map(cat => (
-            <button key={cat.label} className="bg-white rounded-2xl p-4 text-left border border-zinc-100 hover:border-rose-300 hover:shadow-md transition group">
-              <span className="text-3xl mb-2 block">{cat.icon}</span>
-              <p className="font-semibold text-zinc-800 text-sm">{cat.label}</p>
-              <p className="text-xs text-zinc-400 mt-0.5">{cat.desc}</p>
-            </button>
-          ))}
-        </div>
-      </section>
 
       {/* PROPIEDADES DESTACADAS */}
       <section id="comprar" className="max-w-7xl mx-auto px-4 py-10 w-full">
