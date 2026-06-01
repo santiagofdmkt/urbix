@@ -217,6 +217,122 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* PARA INMOBILIARIAS */}
+      <section className="relative w-full py-20 overflow-hidden">
+
+        {/* Imagen de fondo con overlay */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=80"
+            alt="fondo hogar"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(255,241,242,0.97) 0%, rgba(252,231,243,0.95) 50%, rgba(237,233,254,0.93) 100%)" }} />
+        </div>
+
+        {/* Círculos decorativos */}
+        <div className="absolute top-[-80px] right-[-80px] w-96 h-96 rounded-full bg-rose-300/20 blur-3xl z-0" />
+        <div className="absolute bottom-[-60px] left-[-60px] w-72 h-72 rounded-full bg-purple-300/20 blur-3xl z-0" />
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center gap-14">
+
+          {/* Texto */}
+          <div className="flex-1">
+            <div className="inline-flex items-center gap-2 bg-rose-100 border border-rose-200 rounded-full px-4 py-1.5 mb-5">
+              <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+              <p className="text-xs font-bold text-rose-500 uppercase tracking-widest">Para inmobiliarias del interior</p>
+            </div>
+
+            <h2 className="text-4xl md:text-5xl font-black text-zinc-900 leading-tight mb-5">
+              Tus propiedades,<br />
+              <span className="text-rose-500 italic">frente a quien compra.</span>
+            </h2>
+
+            <p className="text-zinc-600 text-base leading-relaxed mb-8 max-w-lg font-medium">
+              Los compradores de Chivilcoy, Mercedes, 9 de Julio y toda la zona ya buscan en Urbix.
+              Sumá tu inmobiliaria y recibí consultas reales — sin pagar por cada click.
+            </p>
+
+            <ul className="space-y-4 mb-10">
+              {[
+                { icon: '📩', title: 'Leads directos', desc: 'El comprador te contacta a vos, sin intermediarios.' },
+                { icon: '🤝', title: 'Sin ataduras',   desc: 'Sin contrato largo — arrancás y parás cuando querés.' },
+                { icon: '📊', title: 'Visibilidad real', desc: 'Sabés exactamente cuánta gente ve tus propiedades.' },
+                { icon: '🏙️', title: 'Foco en el interior', desc: 'Portal diseñado para el interior bonaerense, no para CABA.' },
+              ].map(item => (
+                <li key={item.title} className="flex items-start gap-4">
+                  <div className="w-11 h-11 rounded-2xl bg-white border border-rose-100 shadow-sm flex items-center justify-center text-xl shrink-0">
+                    {item.icon}
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-zinc-800">{item.title}</p>
+                    <p className="text-xs text-zinc-500 mt-0.5">{item.desc}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            <Link
+              href="/soy-inmobiliaria"
+              className="inline-flex items-center gap-2 bg-rose-500 hover:bg-rose-600 text-white font-bold px-8 py-4 rounded-full transition text-sm shadow-xl shadow-rose-300"
+            >
+              Quiero sumar mi inmobiliaria
+              <span className="text-lg">→</span>
+            </Link>
+
+            <p className="text-xs text-zinc-400 mt-3 ml-1">Sin costo de alta · Sin permanencia mínima</p>
+          </div>
+
+          {/* Card visual */}
+          <div className="flex-shrink-0 w-full md:w-[380px]">
+            {/* Card principal */}
+            <div className="rounded-3xl overflow-hidden shadow-2xl border border-white/60 backdrop-blur-sm">
+              {/* Header */}
+              <div className="relative bg-gradient-to-br from-rose-500 via-rose-500 to-pink-600 px-7 py-8 text-white overflow-hidden">
+                <div className="absolute top-[-30px] right-[-30px] w-40 h-40 rounded-full bg-white/10" />
+                <div className="absolute bottom-[-20px] left-[-20px] w-28 h-28 rounded-full bg-white/10" />
+                <p className="text-rose-200 text-xs font-bold uppercase tracking-widest mb-2 relative z-10">Este mes en Urbix</p>
+                <p className="text-4xl font-black relative z-10">205+</p>
+                <p className="text-rose-100 text-sm mt-1 relative z-10 font-medium">propiedades activas en el interior</p>
+              </div>
+
+              {/* Stats */}
+              <div className="bg-white px-7 py-6 space-y-5">
+                {[
+                  { num: '7',    label: 'Ciudades del interior',      icon: '📍' },
+                  { num: '100%', label: 'Gratis para el comprador',   icon: '✅' },
+                  { num: 'IA',   label: 'Búsqueda inteligente',       icon: '🤖' },
+                ].map(s => (
+                  <div key={s.label} className="flex items-center gap-4 border-b border-zinc-100 pb-5 last:border-0 last:pb-0">
+                    <span className="text-xl">{s.icon}</span>
+                    <span className="text-zinc-500 text-sm flex-1">{s.label}</span>
+                    <span className="text-rose-500 font-black text-xl">{s.num}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Footer */}
+              <div className="bg-gradient-to-r from-rose-50 to-purple-50 px-7 py-4 border-t border-rose-100">
+                <p className="text-zinc-500 text-xs text-center leading-relaxed">
+                  Más de <span className="text-zinc-800 font-bold">200 compradores activos</span> buscan propiedades en Urbix cada mes
+                </p>
+              </div>
+            </div>
+
+            {/* Badge flotante */}
+            <div className="mt-4 mx-4 bg-white rounded-2xl px-5 py-3.5 shadow-lg border border-zinc-100 flex items-center gap-3">
+              <span className="text-2xl">🚀</span>
+              <div>
+                <p className="text-xs font-bold text-zinc-800">Expansión en curso</p>
+                <p className="text-xs text-zinc-400">Nuevas ciudades sumándose cada mes</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+
       {/* EXPLORAR POR TIPO */}
       <section className="max-w-7xl mx-auto px-4 py-10 w-full">
         <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Explorá por categoría</p>
