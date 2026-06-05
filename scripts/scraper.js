@@ -273,4 +273,25 @@ async function main() {
   });
   const page = await context.newPage();
 
-  try {
+try {
+    const propArgenprop = await scrapearArgenprop(page);
+    const propZonaprop = await scrapearZonaprop(page);
+    const todasLasPropiedades = [...propArgenprop, ...propZonaprop];
+
+    console.log(`\n📦 Total a procesar: ${todasLasPropiedades.length} propiedades`);
+
+    for (const prop of todasLasPropiedades) {
+      if (!prop.url_origen) { console.log('  ⏭ Sin URL, saltada.'); continue; }
+      await guardarPropiedad(prop, page);
+      await page.waitForTimeout(1000);
+    }
+
+    console.log('\n✅ Scraping finalizado.');
+  } catch (e) {
+    console.error('❌ Error general:', e.message);
+  } finally {
+    await browser.close();
+  }
+}
+
+main();
