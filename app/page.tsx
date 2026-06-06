@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import BuscadorHero from './BuscadorHero'
+import BotonesHero from './BotonesHero'
 
 const LOCALIDADES = [
   { nombre: 'Chivilcoy',       cp: 6620 },
@@ -18,26 +19,26 @@ const FOTOS_LOCALIDADES: Record<string, string> = {
   'Mercedes':        'https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=400&q=80',
   '25 de Mayo':      'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=400&q=80',
   '9 de Julio':      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&q=80',
-  'Pehuajó': 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&q=80',
+  'Pehuajó':         'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&q=80',
   'Trenque Lauquen': 'https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=400&q=80',
   'Lobos':           'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&q=80',
 }
 
 const FOTOS_PROXIMAMENTE: Record<string, string> = {
-  'Palermo':        'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400&q=80',
-  'Belgrano':       'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?w=400&q=80',
-  'Recoleta':       'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&q=80',
-  'Caballito':      'https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=400&q=80',
-  'San Telmo':      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&q=80',
-  'Puerto Madero':  'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&q=80',
-  'Almagro':        'https://images.unsplash.com/photo-1576941089067-2de3c901e126?w=400&q=80',
-  'Mar del Plata':  'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80',
-  'Pinamar':        'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=400&q=80',
-  'Villa Gesell':   'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&q=80',
-  'Miramar':        'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?w=400&q=80',
-  'Necochea':       'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80',
-  'Monte Hermoso':  'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&q=80',
-  'Bahía Blanca':   'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400&q=80',
+  'Palermo':           'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400&q=80',
+  'Belgrano':          'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?w=400&q=80',
+  'Recoleta':          'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&q=80',
+  'Caballito':         'https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=400&q=80',
+  'San Telmo':         'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&q=80',
+  'Puerto Madero':     'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&q=80',
+  'Almagro':           'https://images.unsplash.com/photo-1576941089067-2de3c901e126?w=400&q=80',
+  'Mar del Plata':     'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80',
+  'Pinamar':           'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=400&q=80',
+  'Villa Gesell':      'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&q=80',
+  'Miramar':           'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?w=400&q=80',
+  'Necochea':          'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80',
+  'Monte Hermoso':     'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&q=80',
+  'Bahía Blanca':      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400&q=80',
   'Córdoba Capital':   'https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=400&q=80',
   'Villa Carlos Paz':  'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&q=80',
   'Río Cuarto':        'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=400&q=80',
@@ -140,7 +141,7 @@ export default async function Home() {
     return t.length > 80 ? t.slice(0, 80).trim() + '...' : t
   }
 
-const destacadas = propiedades.filter((p: any) => p.operacion === 'venta').slice(0, 8)
+  const destacadas = propiedades.filter((p: any) => p.operacion === 'venta').slice(0, 8)
   const alquileres = propiedades.filter((p: any) => p.operacion === 'alquiler').slice(0, 8)
   const recientes = propiedades.slice(0, 9)
 
@@ -152,8 +153,8 @@ const destacadas = propiedades.filter((p: any) => p.operacion === 'venta').slice
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link href="/" className="text-2xl font-bold text-rose-500 tracking-tight shrink-0">urbix</Link>
           <nav className="hidden md:flex items-center gap-6 text-sm">
-            <Link href="#comprar" className="text-zinc-500 hover:text-zinc-800 transition">Comprar</Link>
-            <Link href="#alquilar" className="text-zinc-500 hover:text-zinc-800 transition">Alquilar</Link>
+            <a href="#comprar" className="text-zinc-500 hover:text-zinc-800 transition">Comprar</a>
+            <a href="#alquiler" className="text-zinc-500 hover:text-zinc-800 transition">Alquilar</a>
             <Link href="/soy-inmobiliaria" className="text-zinc-500 hover:text-zinc-800 transition font-medium">Soy inmobiliaria</Link>
           </nav>
           <div className="hidden md:flex items-center gap-3">
@@ -186,20 +187,7 @@ const destacadas = propiedades.filter((p: any) => p.operacion === 'venta').slice
           Describí lo que buscás con tus palabras. Sin filtros complicados.
         </p>
         <div className="max-w-2xl mx-auto w-full">
-          <div className="flex justify-center gap-2 mb-4">
-            {[
-              { label: 'Comprar', href: '#comprar' },
-              { label: 'Alquilar', href: '#alquiler' },
-            ].map((tab, i) => (
-              <a key={tab.label} href={tab.href} className={`px-6 py-2 rounded-full text-sm font-semibold transition border ${
-                i === 0
-                  ? 'bg-rose-500 text-white border-rose-500'
-                  : 'bg-white text-zinc-500 border-zinc-200 hover:border-rose-300'
-              }`}>
-                {tab.label}
-              </a>
-            ))}
-          </div>
+          <BotonesHero />
           <BuscadorHero />
         </div>
       </section>
@@ -223,51 +211,35 @@ const destacadas = propiedades.filter((p: any) => p.operacion === 'venta').slice
 
       {/* PARA INMOBILIARIAS */}
       <section className="relative w-full py-20 overflow-hidden">
-
-        {/* Imagen de fondo con overlay */}
         <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=80"
-            alt="fondo hogar"
-            className="w-full h-full object-cover"
-          />
+          <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=80" alt="fondo hogar" className="w-full h-full object-cover" />
           <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(255,241,242,0.97) 0%, rgba(252,231,243,0.95) 50%, rgba(237,233,254,0.93) 100%)" }} />
         </div>
-
-        {/* Círculos decorativos */}
         <div className="absolute top-[-80px] right-[-80px] w-96 h-96 rounded-full bg-rose-300/20 blur-3xl z-0" />
         <div className="absolute bottom-[-60px] left-[-60px] w-72 h-72 rounded-full bg-purple-300/20 blur-3xl z-0" />
-
         <div className="relative z-10 max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center gap-14">
-
-          {/* Texto */}
           <div className="flex-1">
             <div className="inline-flex items-center gap-2 bg-rose-100 border border-rose-200 rounded-full px-4 py-1.5 mb-5">
               <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
               <p className="text-xs font-bold text-rose-500 uppercase tracking-widest">Para inmobiliarias del interior</p>
             </div>
-
             <h2 className="text-4xl md:text-5xl font-black text-zinc-900 leading-tight mb-5">
               Tus propiedades,<br />
               <span className="text-rose-500 italic">frente a quien compra.</span>
             </h2>
-
             <p className="text-zinc-600 text-base leading-relaxed mb-8 max-w-lg font-medium">
               Los compradores de Chivilcoy, Mercedes, 9 de Julio y toda la zona ya buscan en Urbix.
               Sumá tu inmobiliaria y recibí consultas reales — sin pagar por cada click.
             </p>
-
             <ul className="space-y-4 mb-10">
               {[
                 { icon: '📩', title: 'Leads directos', desc: 'El comprador te contacta a vos, sin intermediarios.' },
-                { icon: '🤝', title: 'Sin ataduras',   desc: 'Sin contrato largo — arrancás y parás cuando querés.' },
+                { icon: '🤝', title: 'Sin ataduras', desc: 'Sin contrato largo — arrancás y parás cuando querés.' },
                 { icon: '📊', title: 'Visibilidad real', desc: 'Sabés exactamente cuánta gente ve tus propiedades.' },
                 { icon: '🏙️', title: 'Presente en todo el país', desc: 'Tu ciudad tiene su lugar, sin importar donde estés.' },
               ].map(item => (
                 <li key={item.title} className="flex items-start gap-4">
-                  <div className="w-11 h-11 rounded-2xl bg-white border border-rose-100 shadow-sm flex items-center justify-center text-xl shrink-0">
-                    {item.icon}
-                  </div>
+                  <div className="w-11 h-11 rounded-2xl bg-white border border-rose-100 shadow-sm flex items-center justify-center text-xl shrink-0">{item.icon}</div>
                   <div>
                     <p className="text-sm font-bold text-zinc-800">{item.title}</p>
                     <p className="text-xs text-zinc-500 mt-0.5">{item.desc}</p>
@@ -275,37 +247,26 @@ const destacadas = propiedades.filter((p: any) => p.operacion === 'venta').slice
                 </li>
               ))}
             </ul>
-
-            <Link
-              href="/soy-inmobiliaria"
-              className="inline-flex items-center gap-2 bg-rose-500 hover:bg-rose-600 text-white font-bold px-8 py-4 rounded-full transition text-sm shadow-xl shadow-rose-300"
-            >
+            <Link href="/soy-inmobiliaria" className="inline-flex items-center gap-2 bg-rose-500 hover:bg-rose-600 text-white font-bold px-8 py-4 rounded-full transition text-sm shadow-xl shadow-rose-300">
               Quiero sumar mi inmobiliaria
               <span className="text-lg">→</span>
             </Link>
-
             <p className="text-xs text-zinc-400 mt-3 ml-1">Sin costo de alta · Sin permanencia mínima</p>
           </div>
-
-          {/* Card visual */}
           <div className="flex-shrink-0 w-full md:w-[380px]">
-            {/* Card principal */}
             <div className="rounded-3xl overflow-hidden shadow-2xl border border-white/60 backdrop-blur-sm">
-              {/* Header */}
               <div className="relative bg-gradient-to-br from-rose-500 via-rose-500 to-pink-600 px-7 py-8 text-white overflow-hidden">
                 <div className="absolute top-[-30px] right-[-30px] w-40 h-40 rounded-full bg-white/10" />
                 <div className="absolute bottom-[-20px] left-[-20px] w-28 h-28 rounded-full bg-white/10" />
                 <p className="text-rose-200 text-xs font-bold uppercase tracking-widest mb-2 relative z-10">Este mes en Urbix</p>
-                <p className="text-4xl font-black relative z-10">205+</p>
+                <p className="text-4xl font-black relative z-10">{total}+</p>
                 <p className="text-rose-100 text-sm mt-1 relative z-10 font-medium">propiedades activas en el interior</p>
               </div>
-
-              {/* Stats */}
               <div className="bg-white px-7 py-6 space-y-5">
                 {[
-                  { num: '7',    label: 'Ciudades del interior',      icon: '📍' },
-                  { num: '100%', label: 'Gratis para el comprador',   icon: '✅' },
-                  { num: 'IA',   label: 'Búsqueda inteligente',       icon: '🤖' },
+                  { num: '7', label: 'Ciudades del interior', icon: '📍' },
+                  { num: '100%', label: 'Gratis para el comprador', icon: '✅' },
+                  { num: 'IA', label: 'Búsqueda inteligente', icon: '🤖' },
                 ].map(s => (
                   <div key={s.label} className="flex items-center gap-4 border-b border-zinc-100 pb-5 last:border-0 last:pb-0">
                     <span className="text-xl">{s.icon}</span>
@@ -314,16 +275,12 @@ const destacadas = propiedades.filter((p: any) => p.operacion === 'venta').slice
                   </div>
                 ))}
               </div>
-
-              {/* Footer */}
               <div className="bg-gradient-to-r from-rose-50 to-purple-50 px-7 py-4 border-t border-rose-100">
                 <p className="text-zinc-500 text-xs text-center leading-relaxed">
                   Más de <span className="text-zinc-800 font-bold">200 compradores activos</span> buscan propiedades en Urbix cada mes
                 </p>
               </div>
             </div>
-
-            {/* Badge flotante */}
             <div className="mt-4 mx-4 bg-white rounded-2xl px-5 py-3.5 shadow-lg border border-zinc-100 flex items-center gap-3">
               <span className="text-2xl">🚀</span>
               <div>
@@ -332,106 +289,103 @@ const destacadas = propiedades.filter((p: any) => p.operacion === 'venta').slice
               </div>
             </div>
           </div>
-
         </div>
       </section>
 
-
       {/* PROPIEDADES EN VENTA */}
-<section id="comprar" className="max-w-7xl mx-auto px-4 py-10 w-full">
-  <div className="flex items-center justify-between mb-5">
-    <div>
-      <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Nuevas y destacadas</p>
-      <h2 className="text-2xl font-bold text-zinc-900">Lo último disponible</h2>
-    </div>
-    <Link href="/propiedades?operacion=venta" className="text-sm text-rose-500 hover:underline font-medium shrink-0">Ver más →</Link>
-  </div>
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-    {destacadas.map(p => {
-      const img = getImg(p.imagenes)
-      if (!img) return null
-      const titulo = getTitulo(p.titulo)
-      return (
-        <Link key={p.id} href={`/propiedad/${p.id}`} className="group block rounded-2xl overflow-hidden border border-zinc-100 hover:shadow-lg transition">
-          <div className="relative h-44 bg-zinc-100 overflow-hidden">
-            <img src={img} alt={titulo} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
-            <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-xs font-semibold text-rose-500 px-2 py-1 rounded-lg">
-              {p.moneda} {p.precio?.toLocaleString('es-AR')}
-            </div>
-            <div className="absolute top-2 right-2 bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-              Venta
-            </div>
+      <section id="comprar" className="max-w-7xl mx-auto px-4 py-10 w-full">
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Nuevas y destacadas</p>
+            <h2 className="text-2xl font-bold text-zinc-900">Lo último disponible</h2>
           </div>
-          <div className="p-3">
-            <p className="text-sm font-semibold text-zinc-800 line-clamp-1">{titulo}</p>
-            <p className="text-xs text-zinc-400 mt-0.5 line-clamp-1">{p.direccion}</p>
-            <div className="flex gap-3 mt-2 text-xs text-zinc-500">
-              {p.dormitorios && <span>{p.dormitorios} dorm.</span>}
-              {p.banos && <span>{p.banos} baños</span>}
-              {p.superficie_m2 && <span>{p.superficie_m2} m²</span>}
-            </div>
-          </div>
-        </Link>
-      )
-    })}
-  </div>
-</section>
+          <Link href="/propiedades?operacion=venta" className="text-sm text-rose-500 hover:underline font-medium shrink-0">Ver más →</Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {destacadas.map(p => {
+            const img = getImg(p.imagenes)
+            if (!img) return null
+            const titulo = getTitulo(p.titulo)
+            return (
+              <Link key={p.id} href={`/propiedad/${p.id}`} className="group block rounded-2xl overflow-hidden border border-zinc-100 hover:shadow-lg transition">
+                <div className="relative h-44 bg-zinc-100 overflow-hidden">
+                  <img src={img} alt={titulo} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                  <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-xs font-semibold text-rose-500 px-2 py-1 rounded-lg">
+                    {p.moneda} {p.precio?.toLocaleString('es-AR')}
+                  </div>
+                  <div className="absolute top-2 right-2 bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                    Venta
+                  </div>
+                </div>
+                <div className="p-3">
+                  <p className="text-sm font-semibold text-zinc-800 line-clamp-1">{titulo}</p>
+                  <p className="text-xs text-zinc-400 mt-0.5 line-clamp-1">{p.direccion}</p>
+                  <div className="flex gap-3 mt-2 text-xs text-zinc-500">
+                    {p.dormitorios && <span>{p.dormitorios} dorm.</span>}
+                    {p.banos && <span>{p.banos} baños</span>}
+                    {p.superficie_m2 && <span>{p.superficie_m2} m²</span>}
+                  </div>
+                </div>
+              </Link>
+            )
+          })}
+        </div>
+      </section>
 
-{/* PROPIEDADES EN ALQUILER */}
-<section id="alquiler" className="bg-zinc-50 w-full py-10">
-  <div className="max-w-7xl mx-auto px-4">
-    <div className="flex items-center justify-between mb-5">
-      <div>
-        <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Disponibles ahora</p>
-        <h2 className="text-2xl font-bold text-zinc-900">Propiedades en alquiler</h2>
-      </div>
-      <Link href="/propiedades?operacion=alquiler" className="text-sm text-rose-500 hover:underline font-medium shrink-0">Ver más →</Link>
-    </div>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      {alquileres.map(p => {
-        const img = getImg(p.imagenes)
-        if (!img) return null
-        const titulo = getTitulo(p.titulo)
-        return (
-          <Link key={p.id} href={`/propiedad/${p.id}`} className="group block rounded-2xl overflow-hidden border border-zinc-100 hover:shadow-lg transition bg-white">
-            <div className="relative h-44 bg-zinc-100 overflow-hidden">
-              <img src={img} alt={titulo} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
-              <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-xs font-semibold text-rose-500 px-2 py-1 rounded-lg">
-                {p.moneda} {p.precio?.toLocaleString('es-AR')}
-              </div>
-              <div className="absolute top-2 right-2 bg-blue-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                Alquiler
-              </div>
+      {/* PROPIEDADES EN ALQUILER */}
+      <section id="alquiler" className="bg-zinc-50 w-full py-10">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Disponibles ahora</p>
+              <h2 className="text-2xl font-bold text-zinc-900">Propiedades en alquiler</h2>
             </div>
-            <div className="p-3">
-              <p className="text-sm font-semibold text-zinc-800 line-clamp-1">{titulo}</p>
-              <p className="text-xs text-zinc-400 mt-0.5 line-clamp-1">{p.direccion}</p>
-              <div className="flex gap-3 mt-2 text-xs text-zinc-500">
-                {p.dormitorios && <span>{p.dormitorios} dorm.</span>}
-                {p.banos && <span>{p.banos} baños</span>}
-                {p.superficie_m2 && <span>{p.superficie_m2} m²</span>}
-              </div>
+            <Link href="/propiedades?operacion=alquiler" className="text-sm text-rose-500 hover:underline font-medium shrink-0">Ver más →</Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {alquileres.map(p => {
+              const img = getImg(p.imagenes)
+              if (!img) return null
+              const titulo = getTitulo(p.titulo)
+              return (
+                <Link key={p.id} href={`/propiedad/${p.id}`} className="group block rounded-2xl overflow-hidden border border-zinc-100 hover:shadow-lg transition bg-white">
+                  <div className="relative h-44 bg-zinc-100 overflow-hidden">
+                    <img src={img} alt={titulo} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                    <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-xs font-semibold text-rose-500 px-2 py-1 rounded-lg">
+                      {p.moneda} {p.precio?.toLocaleString('es-AR')}
+                    </div>
+                    <div className="absolute top-2 right-2 bg-blue-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                      Alquiler
+                    </div>
+                  </div>
+                  <div className="p-3">
+                    <p className="text-sm font-semibold text-zinc-800 line-clamp-1">{titulo}</p>
+                    <p className="text-xs text-zinc-400 mt-0.5 line-clamp-1">{p.direccion}</p>
+                    <div className="flex gap-3 mt-2 text-xs text-zinc-500">
+                      {p.dormitorios && <span>{p.dormitorios} dorm.</span>}
+                      {p.banos && <span>{p.banos} baños</span>}
+                      {p.superficie_m2 && <span>{p.superficie_m2} m²</span>}
+                    </div>
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+          {alquileres.length === 0 && (
+            <div className="text-center py-16 text-zinc-400">
+              <p className="text-4xl mb-3">🏠</p>
+              <p className="font-semibold">Próximamente propiedades en alquiler</p>
+              <p className="text-sm mt-1">Estamos incorporando más propiedades cada día</p>
             </div>
-          </Link>
-        )
-      })}
-    </div>
-    {alquileres.length === 0 && (
-      <div className="text-center py-16 text-zinc-400">
-        <p className="text-4xl mb-3">🏠</p>
-        <p className="font-semibold">Próximamente propiedades en alquiler</p>
-        <p className="text-sm mt-1">Estamos incorporando más propiedades cada día</p>
-      </div>
-    )}
-  </div>
-</section>
+          )}
+        </div>
+      </section>
 
       {/* LOCALIDADES POR ZONA */}
       <section className="bg-zinc-50 py-12 w-full overflow-x-hidden">
         <div className="max-w-7xl mx-auto px-4">
           <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Cobertura regional</p>
           <h2 className="text-2xl font-bold text-zinc-900 mb-8">Propiedades por zona</h2>
-
           <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Provincia de Buenos Aires</p>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-10">
             {LOCALIDADES.map(loc => {
@@ -439,23 +393,13 @@ const destacadas = propiedades.filter((p: any) => p.operacion === 'venta').slice
               const tiene = cant > 0
               const foto = FOTOS_LOCALIDADES[loc.nombre] || DEFAULT_FOTO
               return (
-                <Link
-                  key={loc.nombre}
-                  href={tiene ? '/localidad/' + encodeURIComponent(loc.nombre) : '#'}
+                <Link key={loc.nombre} href={tiene ? '/localidad/' + encodeURIComponent(loc.nombre) : '#'}
                   className={`relative rounded-2xl overflow-hidden group cursor-pointer ${tiene ? 'hover:shadow-lg' : 'opacity-70 pointer-events-none'} transition`}>
                   <div className="h-28 relative">
                     <img src={foto} alt={loc.nombre} className={`w-full h-full object-cover ${tiene ? 'group-hover:scale-105' : 'grayscale'} transition duration-500`} />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                    {!tiene && (
-                      <div className="absolute top-2 right-2 bg-zinc-700/80 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
-                        Próximamente
-                      </div>
-                    )}
-                    {tiene && (
-                      <div className="absolute top-2 right-2 bg-rose-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
-                        {cant} prop.
-                      </div>
-                    )}
+                    {!tiene && <div className="absolute top-2 right-2 bg-zinc-700/80 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">Próximamente</div>}
+                    {tiene && <div className="absolute top-2 right-2 bg-rose-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">{cant} prop.</div>}
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 p-2">
                     <p className="text-white text-xs font-semibold leading-tight">{loc.nombre}</p>
@@ -464,27 +408,14 @@ const destacadas = propiedades.filter((p: any) => p.operacion === 'venta').slice
               )
             })}
           </div>
-
           <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Ciudad Autónoma de Buenos Aires</p>
-          <div className="mb-10">
-            <ProximamenteGrid items={['Palermo', 'Belgrano', 'Recoleta', 'Caballito', 'San Telmo', 'Puerto Madero', 'Almagro']} />
-          </div>
-
+          <div className="mb-10"><ProximamenteGrid items={['Palermo', 'Belgrano', 'Recoleta', 'Caballito', 'San Telmo', 'Puerto Madero', 'Almagro']} /></div>
           <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Costa Atlántica</p>
-          <div className="mb-10">
-            <ProximamenteGrid items={['Mar del Plata', 'Pinamar', 'Villa Gesell', 'Miramar', 'Necochea', 'Monte Hermoso', 'Bahía Blanca']} />
-          </div>
-
+          <div className="mb-10"><ProximamenteGrid items={['Mar del Plata', 'Pinamar', 'Villa Gesell', 'Miramar', 'Necochea', 'Monte Hermoso', 'Bahía Blanca']} /></div>
           <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Córdoba</p>
-          <div className="mb-10">
-            <ProximamenteGrid items={['Córdoba Capital', 'Villa Carlos Paz', 'Río Cuarto', 'Alta Gracia', 'Villa María', 'Cosquín', 'La Falda']} />
-          </div>
-
+          <div className="mb-10"><ProximamenteGrid items={['Córdoba Capital', 'Villa Carlos Paz', 'Río Cuarto', 'Alta Gracia', 'Villa María', 'Cosquín', 'La Falda']} /></div>
           <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Santa Fe</p>
-          <div className="mb-10">
-            <ProximamenteGrid items={['Rosario', 'Santa Fe Capital', 'Rafaela', 'Venado Tuerto', 'Reconquista', 'San Lorenzo', 'Esperanza']} />
-          </div>
-
+          <div className="mb-10"><ProximamenteGrid items={['Rosario', 'Santa Fe Capital', 'Rafaela', 'Venado Tuerto', 'Reconquista', 'San Lorenzo', 'Esperanza']} /></div>
           <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">La Pampa</p>
           <ProximamenteGrid items={['Santa Rosa', 'General Pico', 'Toay', 'Realicó', 'General Acha', 'Eduardo Castex', 'Victorica']} />
         </div>
@@ -525,8 +456,7 @@ const destacadas = propiedades.filter((p: any) => p.operacion === 'venta').slice
           })}
         </div>
         <div className="text-center mt-10">
-          <Link href="/propiedades"
-            className="inline-flex items-center gap-2 bg-white border border-zinc-200 hover:border-rose-400 hover:text-rose-500 text-zinc-600 font-semibold px-8 py-3 rounded-full transition text-sm">
+          <Link href="/propiedades" className="inline-flex items-center gap-2 bg-white border border-zinc-200 hover:border-rose-400 hover:text-rose-500 text-zinc-600 font-semibold px-8 py-3 rounded-full transition text-sm">
             Ver todas las propiedades →
           </Link>
         </div>
@@ -537,54 +467,32 @@ const destacadas = propiedades.filter((p: any) => p.operacion === 'venta').slice
         <div className="max-w-7xl mx-auto px-4">
           <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Dónde encontramos propiedades</p>
           <h2 className="text-2xl font-bold text-zinc-900 mb-2">Explorá por localidad</h2>
-          <p className="text-sm text-zinc-400 mb-8 max-w-lg">
-            Cobertura real en el interior bonaerense. Hacé clic en tu ciudad para ver todas las propiedades disponibles.
-          </p>
+          <p className="text-sm text-zinc-400 mb-8 max-w-lg">Cobertura real en el interior bonaerense. Hacé clic en tu ciudad para ver todas las propiedades disponibles.</p>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {LOCALIDADES.map(loc => {
               const cant = conteoXCiudad[loc.nombre] || 0
               const foto = FOTOS_LOCALIDADES[loc.nombre] || DEFAULT_FOTO
               const tiene = cant > 0
               return (
-                <Link
-                  key={loc.nombre}
-                  href={tiene ? '/localidad/' + encodeURIComponent(loc.nombre) : '#'}
-                  className={`group relative rounded-3xl overflow-hidden block ${tiene ? 'hover:shadow-xl' : 'opacity-50 pointer-events-none'} transition-all duration-300`}
-                >
+                <Link key={loc.nombre} href={tiene ? '/localidad/' + encodeURIComponent(loc.nombre) : '#'}
+                  className={`group relative rounded-3xl overflow-hidden block ${tiene ? 'hover:shadow-xl' : 'opacity-50 pointer-events-none'} transition-all duration-300`}>
                   <div className="h-48 md:h-56 relative overflow-hidden">
-                    <img
-                      src={foto}
-                      alt={loc.nombre}
-                      className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
-                    />
+                    <img src={foto} alt={loc.nombre} className="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                   </div>
-                  {tiene && (
-                    <div className="absolute top-3 right-3 bg-rose-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg">
-                      {cant} prop.
-                    </div>
-                  )}
+                  {tiene && <div className="absolute top-3 right-3 bg-rose-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg">{cant} prop.</div>}
                   <div className="absolute bottom-0 left-0 right-0 p-4">
                     <p className="text-white font-bold text-lg leading-tight">{loc.nombre}</p>
-                    <p className="text-rose-200 text-xs mt-0.5 font-medium">
-                      {tiene ? 'Ver propiedades →' : 'Próximamente'}
-                    </p>
+                    <p className="text-rose-200 text-xs mt-0.5 font-medium">{tiene ? 'Ver propiedades →' : 'Próximamente'}</p>
                   </div>
                 </Link>
               )
             })}
-
-            {/* Tarjeta CTA */}
             <div className="relative rounded-3xl overflow-hidden bg-rose-500 flex flex-col items-center justify-center p-6 text-center min-h-[192px] md:min-h-[224px]">
               <div className="text-4xl mb-3">📍</div>
               <p className="text-white font-bold text-base leading-snug mb-1">¿Tu ciudad no está?</p>
               <p className="text-rose-100 text-xs mb-4">Estamos expandiéndonos. Avisanos y la sumamos.</p>
-              <Link
-                href="/contacto"
-                className="bg-white text-rose-500 text-xs font-bold px-4 py-2 rounded-full hover:bg-rose-50 transition"
-              >
-                Sugerir ciudad
-              </Link>
+              <Link href="/contacto" className="bg-white text-rose-500 text-xs font-bold px-4 py-2 rounded-full hover:bg-rose-50 transition">Sugerir ciudad</Link>
             </div>
           </div>
         </div>
@@ -596,9 +504,7 @@ const destacadas = propiedades.filter((p: any) => p.operacion === 'venta').slice
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
             <div className="col-span-2 md:col-span-1">
               <p className="text-2xl font-bold text-rose-400 mb-3">urbix</p>
-              <p className="text-sm text-zinc-400 leading-relaxed">
-                El buscador inmobiliario con IA que entiende lo que buscás.
-              </p>
+              <p className="text-sm text-zinc-400 leading-relaxed">El buscador inmobiliario con IA que entiende lo que buscás.</p>
               <div className="flex gap-3 mt-4">
                 {['I', 'T', 'L'].map(s => (
                   <a key={s} href="#" className="w-8 h-8 bg-zinc-800 hover:bg-rose-500 rounded-full flex items-center justify-center transition">
@@ -619,11 +525,7 @@ const destacadas = propiedades.filter((p: any) => p.operacion === 'venta').slice
               <p className="text-sm font-semibold text-zinc-300 mb-4">Localidades</p>
               <ul className="space-y-2 text-sm text-zinc-500">
                 {['Chivilcoy', 'Mercedes', '25 de Mayo', '9 de Julio', 'Pehuajó', 'Trenque Lauquen', 'Lobos'].map(l => (
-                  <li key={l}>
-                    <Link href={'/localidad/' + encodeURIComponent(l)} className="hover:text-rose-400 transition">
-                      {l}
-                    </Link>
-                  </li>
+                  <li key={l}><Link href={'/localidad/' + encodeURIComponent(l)} className="hover:text-rose-400 transition">{l}</Link></li>
                 ))}
               </ul>
             </div>
