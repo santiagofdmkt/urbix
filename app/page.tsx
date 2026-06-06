@@ -140,7 +140,8 @@ export default async function Home() {
     return t.length > 80 ? t.slice(0, 80).trim() + '...' : t
   }
 
-  const destacadas = propiedades.slice(0, 8)
+const destacadas = propiedades.filter((p: any) => p.operacion === 'venta').slice(0, 8)
+  const alquileres = propiedades.filter((p: any) => p.operacion === 'alquiler').slice(0, 8)
   const recientes = propiedades.slice(0, 9)
 
   return (
@@ -333,42 +334,94 @@ export default async function Home() {
       </section>
 
 
-      {/* PROPIEDADES DESTACADAS */}
-      <section id="comprar" className="max-w-7xl mx-auto px-4 py-10 w-full">
-        <div className="flex items-center justify-between mb-5">
-          <div>
-            <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Nuevas y destacadas</p>
-            <h2 className="text-2xl font-bold text-zinc-900">Lo último disponible</h2>
+      {/* PROPIEDADES EN VENTA */}
+<section id="comprar" className="max-w-7xl mx-auto px-4 py-10 w-full">
+  <div className="flex items-center justify-between mb-5">
+    <div>
+      <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Nuevas y destacadas</p>
+      <h2 className="text-2xl font-bold text-zinc-900">Lo último disponible</h2>
+    </div>
+    <Link href="/propiedades?operacion=venta" className="text-sm text-rose-500 hover:underline font-medium shrink-0">Ver más →</Link>
+  </div>
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    {destacadas.map(p => {
+      const img = getImg(p.imagenes)
+      if (!img) return null
+      const titulo = getTitulo(p.titulo)
+      return (
+        <Link key={p.id} href={`/propiedad/${p.id}`} className="group block rounded-2xl overflow-hidden border border-zinc-100 hover:shadow-lg transition">
+          <div className="relative h-44 bg-zinc-100 overflow-hidden">
+            <img src={img} alt={titulo} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+            <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-xs font-semibold text-rose-500 px-2 py-1 rounded-lg">
+              {p.moneda} {p.precio?.toLocaleString('es-AR')}
+            </div>
+            <div className="absolute top-2 right-2 bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+              Venta
+            </div>
           </div>
-          <Link href="/propiedades" className="text-sm text-rose-500 hover:underline font-medium shrink-0">Ver más →</Link>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {destacadas.map(p => {
-            const img = getImg(p.imagenes)
-            if (!img) return null
-            const titulo = getTitulo(p.titulo)
-            return (
-              <Link key={p.id} href={`/propiedad/${p.id}`} className="group block rounded-2xl overflow-hidden border border-zinc-100 hover:shadow-lg transition">
-                <div className="relative h-44 bg-zinc-100 overflow-hidden">
-                  <img src={img} alt={titulo} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
-                  <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-xs font-semibold text-rose-500 px-2 py-1 rounded-lg">
-                    {p.moneda} {p.precio?.toLocaleString('es-AR')}
-                  </div>
-                </div>
-                <div className="p-3">
-                  <p className="text-sm font-semibold text-zinc-800 line-clamp-1">{titulo}</p>
-                  <p className="text-xs text-zinc-400 mt-0.5 line-clamp-1">{p.direccion}</p>
-                  <div className="flex gap-3 mt-2 text-xs text-zinc-500">
-                    {p.dormitorios && <span>{p.dormitorios} dorm.</span>}
-                    {p.banos && <span>{p.banos} baños</span>}
-                    {p.superficie_m2 && <span>{p.superficie_m2} m²</span>}
-                  </div>
-                </div>
-              </Link>
-            )
-          })}
-        </div>
-      </section>
+          <div className="p-3">
+            <p className="text-sm font-semibold text-zinc-800 line-clamp-1">{titulo}</p>
+            <p className="text-xs text-zinc-400 mt-0.5 line-clamp-1">{p.direccion}</p>
+            <div className="flex gap-3 mt-2 text-xs text-zinc-500">
+              {p.dormitorios && <span>{p.dormitorios} dorm.</span>}
+              {p.banos && <span>{p.banos} baños</span>}
+              {p.superficie_m2 && <span>{p.superficie_m2} m²</span>}
+            </div>
+          </div>
+        </Link>
+      )
+    })}
+  </div>
+</section>
+
+{/* PROPIEDADES EN ALQUILER */}
+<section id="alquiler" className="bg-zinc-50 w-full py-10">
+  <div className="max-w-7xl mx-auto px-4">
+    <div className="flex items-center justify-between mb-5">
+      <div>
+        <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Disponibles ahora</p>
+        <h2 className="text-2xl font-bold text-zinc-900">Propiedades en alquiler</h2>
+      </div>
+      <Link href="/propiedades?operacion=alquiler" className="text-sm text-rose-500 hover:underline font-medium shrink-0">Ver más →</Link>
+    </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {alquileres.map(p => {
+        const img = getImg(p.imagenes)
+        if (!img) return null
+        const titulo = getTitulo(p.titulo)
+        return (
+          <Link key={p.id} href={`/propiedad/${p.id}`} className="group block rounded-2xl overflow-hidden border border-zinc-100 hover:shadow-lg transition bg-white">
+            <div className="relative h-44 bg-zinc-100 overflow-hidden">
+              <img src={img} alt={titulo} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+              <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-xs font-semibold text-rose-500 px-2 py-1 rounded-lg">
+                {p.moneda} {p.precio?.toLocaleString('es-AR')}
+              </div>
+              <div className="absolute top-2 right-2 bg-blue-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                Alquiler
+              </div>
+            </div>
+            <div className="p-3">
+              <p className="text-sm font-semibold text-zinc-800 line-clamp-1">{titulo}</p>
+              <p className="text-xs text-zinc-400 mt-0.5 line-clamp-1">{p.direccion}</p>
+              <div className="flex gap-3 mt-2 text-xs text-zinc-500">
+                {p.dormitorios && <span>{p.dormitorios} dorm.</span>}
+                {p.banos && <span>{p.banos} baños</span>}
+                {p.superficie_m2 && <span>{p.superficie_m2} m²</span>}
+              </div>
+            </div>
+          </Link>
+        )
+      })}
+    </div>
+    {alquileres.length === 0 && (
+      <div className="text-center py-16 text-zinc-400">
+        <p className="text-4xl mb-3">🏠</p>
+        <p className="font-semibold">Próximamente propiedades en alquiler</p>
+        <p className="text-sm mt-1">Estamos incorporando más propiedades cada día</p>
+      </div>
+    )}
+  </div>
+</section>
 
       {/* LOCALIDADES POR ZONA */}
       <section className="bg-zinc-50 py-12 w-full overflow-x-hidden">
