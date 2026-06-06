@@ -1,7 +1,7 @@
 // scripts/scraper-interior.js
 // Ciudades del interior bonaerense — ArgenProp
 // URLs directas sin subir al Storage | Con inmobiliaria
-// playwright-extra + stealth
+// playwright-extra + stealth + protecciones anti-ban
 
 const { chromium } = require('playwright-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
@@ -27,6 +27,49 @@ const CIUDAD = { nombre: 'Chivilcoy', slug: 'partido-de-chivilcoy' };
 
 const OPERACIONES = ['venta', 'alquiler'];
 const MAX_PAGINAS = 10;
+
+// ─── LÍMITE DE SEGURIDAD — pausa larga cada N propiedades ─────────────────
+const PAUSA_CADA = 20;       // cada 20 props, descanso largo
+const PAUSA_LARGA_MS = 25000; // 25 segundos de pausa
+
+// ─── USER AGENTS rotativos ────────────────────────────────────────────────
+const USER_AGENTS = [
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0',
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+];
+
+function userAgentAleatorio() {
+  return USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
+}
+
+// ─── DELAYS ALEATORIOS — nunca el mismo número ───────────────────────────
+function delay(minMs, maxMs) {
+  const ms = Math.floor(Math.random() * (maxMs - minMs + 1)) + minMs;
+  return new Promise(r => setTimeout(r, ms));
+}
+
+// ─── SCROLL HUMANO ────────────────────────────────────────────────────────
+async function scrollHumano(page) {
+  await page.evaluate(async () => {
+    await new Promise(resolve => {
+      let totalScroll = 0;
+      const distanciaTotal = Math.floor(Math.random() * 600) + 400;
+      const timer = setInterval(() => {
+        const paso = Math.floor(Math.random() * 80) + 40;
+        window.scrollBy(0, paso);
+        totalScroll += paso;
+        if (totalScroll >= distanciaTotal) {
+          clearInterval(timer);
+          resolve();
+        }
+      }, Math.floor(Math.random() * 80) + 60);
+    });
+  });
+  await delay(300, 800);
+}
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 function limpiarPrecio(texto) {
@@ -61,7 +104,8 @@ async function yaExiste(url) {
 async function obtenerDetalle(page, url) {
   try {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 35000 });
-    await page.waitForTimeout(2500);
+    await delay(2000, 4000); // delay aleatorio post-carga
+    await scrollHumano(page); // scroll como humano
 
     const detalle = await page.evaluate(() => {
       // IMÁGENES — URLs directas de ArgenProp, sin subir al Storage
@@ -81,7 +125,6 @@ async function obtenerDetalle(page, url) {
           .map(el => el.getAttribute('data-src') || el.getAttribute('data-lazy') || el.getAttribute('src'))
           .filter(u => u && !u.includes('svg') && !u.includes('placeholder') && !u.includes('data:') && u.startsWith('http'));
         if (urls.length > 0) {
-          // Normalizar a _u_large
           imagenes = [...new Set(urls)].map(u => u
             .replace(/_u_small\.jpg/, '_u_large.jpg')
             .replace(/_u_medium\.jpg/, '_u_large.jpg')
@@ -195,7 +238,8 @@ async function scrapearListado(page, operacion) {
 
     try {
       await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 35000 });
-      await page.waitForTimeout(2500);
+      await delay(2500, 5000); // delay aleatorio post-carga
+      await scrollHumano(page);
 
       const cantCards = await page.evaluate(() => document.querySelectorAll('.listing__item').length);
       if (cantCards === 0) { console.log(`  ⚠️ Sin resultados en pág ${pag}.`); break; }
@@ -234,9 +278,13 @@ async function scrapearListado(page, operacion) {
         });
       }
 
-      await page.waitForTimeout(2000);
+      // Delay entre páginas del listing — aleatorio, más largo
+      await delay(3000, 6000);
+
     } catch (e) {
       console.log(`  ⚠️ Error pág ${pag}: ${e.message}`);
+      console.log(`  ⏳ Esperando 15s antes de continuar...`);
+      await delay(15000, 20000); // pausa larga si hay error
       break;
     }
   }
@@ -246,28 +294,46 @@ async function scrapearListado(page, operacion) {
 
 // ─── MAIN ─────────────────────────────────────────────────────────────────────
 async function main() {
-  console.log(`🚀 Scraper interior — ${CIUDAD.nombre}\n`);
+  console.log(`🚀 Scraper interior — ${CIUDAD.nombre}`);
+  console.log(`⚠️  Modo cuidadoso: delays aleatorios + scroll humano + pausas cada ${PAUSA_CADA} props\n`);
 
   const browser = await chromium.launch({ headless: false });
   const context = await browser.newContext({
-    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    userAgent: userAgentAleatorio(), // user agent aleatorio cada sesión
     locale: 'es-AR',
     viewport: { width: 1280, height: 900 },
   });
   const page = await context.newPage();
+
+  let contadorTotal = 0;
 
   try {
     for (const operacion of OPERACIONES) {
       console.log(`\n📍 ${CIUDAD.nombre} — ${operacion.toUpperCase()}`);
       const propiedades = await scrapearListado(page, operacion);
       console.log(`  Total encontradas: ${propiedades.length}`);
+
       for (const prop of propiedades) {
         await guardarPropiedad(prop, page, operacion);
-        await page.waitForTimeout(1000);
+        contadorTotal++;
+
+        // Delay entre propiedades — aleatorio
+        await delay(2000, 4500);
+
+        // Cada PAUSA_CADA propiedades, pausa larga
+        if (contadorTotal % PAUSA_CADA === 0) {
+          console.log(`\n  ⏸  ${contadorTotal} props procesadas — pausa de ${PAUSA_LARGA_MS / 1000}s para no levantar sospechas...`);
+          await delay(PAUSA_LARGA_MS, PAUSA_LARGA_MS + 5000);
+          console.log(`  ▶️  Reanudando...\n`);
+        }
       }
-      await page.waitForTimeout(3000);
+
+      // Pausa entre operaciones (venta → alquiler)
+      console.log(`\n  ⏳ Pausa entre operaciones...`);
+      await delay(8000, 12000);
     }
-    console.log(`\n✅ Completado — ${CIUDAD.nombre}`);
+
+    console.log(`\n✅ Completado — ${CIUDAD.nombre} | ${contadorTotal} propiedades procesadas`);
   } catch (e) {
     console.error('❌ Error:', e);
   } finally {
