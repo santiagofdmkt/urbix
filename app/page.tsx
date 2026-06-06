@@ -127,14 +127,14 @@ export default async function Home() {
   const total = propiedades.length
 
   function getImg(imagenes: any): string | null {
-    try {
-      if (!imagenes) return null
-      const raw = typeof imagenes === 'string' ? JSON.parse(imagenes) : imagenes
-      const arr = Array.isArray(raw) ? raw : [raw]
-      const real = arr.find((src: string) => typeof src === 'string' && src.includes('supabase.co'))
-      return real || null
-    } catch { return null }
-  }
+  try {
+    if (!imagenes) return null
+    const raw = typeof imagenes === 'string' ? JSON.parse(imagenes) : imagenes
+    const arr = Array.isArray(raw) ? raw : [raw]
+    const real = arr.find((src: string) => typeof src === 'string' && src.startsWith('http'))
+    return real || null
+  } catch { return null }
+}
 
   function getTitulo(titulo: string | null): string {
     const t = titulo?.trim() || ''
