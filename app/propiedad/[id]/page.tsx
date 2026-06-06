@@ -91,8 +91,8 @@ export default async function PropiedadDetalle({ params }: { params: Promise<{ i
     argenprop: 'ArgenProp',
     mercadolibre: 'Mercado Libre',
   }
-  const fuente = fuenteLabel[p.fuente] || p.fuente || 'Portal inmobiliario'
-  const nombreInmobiliaria = p.inmobiliaria || 'Inmobiliaria no especificada'
+  const fuente = fuenteLabel[p.fuente] || p.fuente || 'portal inmobiliario'
+  const nombreInmobiliaria = p.inmobiliaria || null
 
   return (
     <div className="min-h-screen bg-zinc-50 font-sans">
@@ -187,7 +187,7 @@ export default async function PropiedadDetalle({ params }: { params: Promise<{ i
               <p className="text-zinc-600 text-sm leading-relaxed whitespace-pre-line">{descripcion}</p>
             </div>
 
-            {/* PUBLICADO POR — bloque inmobiliaria con diseño rosa */}
+            {/* PUBLICADO POR */}
             <div className="rounded-2xl overflow-hidden border border-rose-100">
               <div className="bg-gradient-to-r from-rose-500 to-pink-600 px-6 py-5 flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
@@ -195,17 +195,22 @@ export default async function PropiedadDetalle({ params }: { params: Promise<{ i
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                   </svg>
                 </div>
-                <div>
+                <div className="flex-1">
                   <p className="text-rose-100 text-xs font-semibold uppercase tracking-widest mb-0.5">Publicado por</p>
-                  <p className="text-white text-lg font-bold leading-tight">{nombreInmobiliaria}</p>
-                  <p className="text-rose-200 text-xs mt-0.5">Anuncio indexado desde {fuente}</p>
+                  <p className="text-white text-lg font-bold leading-tight">
+                    {nombreInmobiliaria || 'Inmobiliaria'}
+                  </p>
                 </div>
               </div>
-              <div className="bg-rose-50 px-6 py-4">
+              <div className="bg-rose-50 px-6 py-4 space-y-3">
                 <p className="text-xs text-zinc-500 leading-relaxed">
-                  Los derechos de los datos de esta propiedad pertenecen a la inmobiliaria correspondiente.
-                  Esta información se presenta únicamente con fines informativos y de búsqueda.
+                  <span className="font-semibold text-zinc-600">Información sobre los datos:</span> Los derechos de los datos de esta propiedad pertenecen a la inmobiliaria correspondiente. Urbix utiliza múltiples fuentes de portales inmobiliarios como ZonaProp, ArgenProp, Mercado Libre y otros para indexar y mostrar propiedades disponibles en Argentina. Esta información se presenta únicamente con fines informativos y de búsqueda.
                 </p>
+                <Link
+                  href="/soy-inmobiliaria?registro=1"
+                  className="inline-block w-full text-center text-xs font-semibold bg-white border border-rose-200 text-rose-500 hover:bg-rose-500 hover:text-white py-2.5 px-4 rounded-xl transition">
+                  Soy el dueño de esta inmobiliaria y quiero reclamar mi perfil
+                </Link>
               </div>
             </div>
 
