@@ -187,14 +187,17 @@ const destacadas = propiedades.filter((p: any) => p.operacion === 'venta').slice
         </p>
         <div className="max-w-2xl mx-auto w-full">
           <div className="flex justify-center gap-2 mb-4">
-            {['Comprar', 'Alquilar'].map((tab, i) => (
-              <button key={tab} className={`px-6 py-2 rounded-full text-sm font-semibold transition border ${
+            {[
+              { label: 'Comprar', href: '#comprar' },
+              { label: 'Alquilar', href: '#alquiler' },
+            ].map((tab, i) => (
+              <a key={tab.label} href={tab.href} className={`px-6 py-2 rounded-full text-sm font-semibold transition border ${
                 i === 0
                   ? 'bg-rose-500 text-white border-rose-500'
                   : 'bg-white text-zinc-500 border-zinc-200 hover:border-rose-300'
               }`}>
-                {tab}
-              </button>
+                {tab.label}
+              </a>
             ))}
           </div>
           <BuscadorHero />
