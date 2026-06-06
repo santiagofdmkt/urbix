@@ -37,7 +37,7 @@ export default async function PropiedadDetalle({ params }: { params: Promise<{ i
     try {
       if (!imagenes) return null
       const arr = parseImgs(imagenes)
-      return arr.find((s: string) => s.includes('supabase.co')) || arr[0] || null
+      return arr[0] || null
     } catch { return null }
   }
 
@@ -86,6 +86,14 @@ export default async function PropiedadDetalle({ params }: { params: Promise<{ i
       svg: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z"/> },
   ].filter(i => i.value)
 
+  // Fuente legible
+  const fuenteLabel: Record<string, string> = {
+    zonaprop: 'ZonaProp',
+    argenprop: 'ArgenProp',
+    mercadolibre: 'Mercado Libre',
+  }
+  const fuente = fuenteLabel[p.fuente] || p.fuente || 'Portal inmobiliario'
+
   return (
     <div className="min-h-screen bg-zinc-50 font-sans">
 
@@ -100,14 +108,14 @@ export default async function PropiedadDetalle({ params }: { params: Promise<{ i
             <span className="truncate max-w-xs text-xs">{tituloCorto}</span>
           </div>
           <div className="flex items-center gap-3">
-  <Link href="/perfil" className="text-xs text-zinc-400 hover:text-rose-500 transition flex items-center gap-1">
-    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-    </svg>
-    Mis favoritos
-  </Link>
-  <Link href="/" className="text-xs text-zinc-400 hover:text-rose-500 transition">← Volver</Link>
-</div>
+            <Link href="/perfil" className="text-xs text-zinc-400 hover:text-rose-500 transition flex items-center gap-1">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+              </svg>
+              Mis favoritos
+            </Link>
+            <Link href="/" className="text-xs text-zinc-400 hover:text-rose-500 transition">← Volver</Link>
+          </div>
         </div>
       </nav>
 
@@ -177,6 +185,34 @@ export default async function PropiedadDetalle({ params }: { params: Promise<{ i
             <div className="bg-white rounded-2xl border border-zinc-100 p-6">
               <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-4">Descripción</h2>
               <p className="text-zinc-600 text-sm leading-relaxed whitespace-pre-line">{descripcion}</p>
+            </div>
+
+            {/* PUBLICADO POR — bloque inmobiliaria */}
+            <div className="bg-white rounded-2xl border border-zinc-100 p-6">
+              <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-4">Publicado por</h2>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center shrink-0">
+                  <svg className="w-6 h-6 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-zinc-800">{p.inmobiliaria || 'Inmobiliaria no especificada'}</p>
+                  <p className="text-xs text-zinc-400 mt-0.5">Publicado en {fuente}</p>
+                </div>
+                {p.url_origen && (
+                  <a href={p.url_origen} target="_blank" rel="noopener noreferrer"
+                    className="text-xs text-rose-500 hover:underline font-medium shrink-0">
+                    Ver original →
+                  </a>
+                )}
+              </div>
+              <div className="mt-4 pt-4 border-t border-zinc-100">
+                <p className="text-xs text-zinc-400 leading-relaxed">
+                  Los derechos de los datos de esta propiedad pertenecen a la inmobiliaria correspondiente.
+                  Esta información se presenta únicamente con fines informativos y de búsqueda.
+                </p>
+              </div>
             </div>
 
             {waUrl && (
