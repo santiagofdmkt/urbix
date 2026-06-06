@@ -1,6 +1,6 @@
 // scripts/scraper-argenprop.js
 // PRODUCCIÓN — ArgenProp, todas las ciudades Urbix
-// Ventas + alquileres | Descripción e imágenes corregidas
+// Ventas + alquileres | Por tipo | Paginación correcta | Con inmobiliaria
 // playwright-extra + stealth
 
 const { chromium } = require('playwright-extra');
@@ -17,20 +17,32 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const BUCKET = 'propiedades-imagenes';
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// ─── CIUDADES ────────────────────────────────────────────────────────────────
 const CIUDADES = [
-  // { nombre: 'Chivilcoy',       slug: 'partido-de-chivilcoy' },
-  // { nombre: 'Mercedes',        slug: 'partido-de-mercedes' },
-  // { nombre: '25 de Mayo',      slug: 'partido-de-25-de-mayo' },
-  // { nombre: '9 de Julio',      slug: 'partido-de-9-de-julio' },
-  // { nombre: 'Pehuajó',         slug: 'partido-de-pehuajo' },
-  // { nombre: 'Trenque Lauquen', slug: 'partido-de-trenque-lauquen' },
-  // { nombre: 'Lobos',           slug: 'partido-de-lobos' },
-  { nombre: 'Mar del Plata', slug: 'partido-de-general-pueyrredon' },
+  { nombre: 'Chivilcoy',       slug: 'partido-de-chivilcoy' },
+  { nombre: 'Mercedes',        slug: 'partido-de-mercedes' },
+  { nombre: '25 de Mayo',      slug: 'partido-de-25-de-mayo' },
+  { nombre: '9 de Julio',      slug: 'partido-de-9-de-julio' },
+  { nombre: 'Pehuajó',         slug: 'partido-de-pehuajo' },
+  { nombre: 'Trenque Lauquen', slug: 'partido-de-trenque-lauquen' },
+  { nombre: 'Lobos',           slug: 'partido-de-lobos' },
+  { nombre: 'Mar del Plata',   slug: 'mar-del-plata' },
 ];
 
 const OPERACIONES = ['venta', 'alquiler'];
+
+const TIPOS = [
+  'casas',
+  'departamentos',
+  'terrenos',
+  'locales-y-oficinas',
+  'quintas-y-chacras',
+  'galpones-y-depositos',
+];
+
 const MAX_PAGINAS = 10;
 
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
 function limpiarPrecio(texto) {
   if (!texto) return null;
   const match = texto.match(/[\d.]+/);
@@ -119,6 +131,7 @@ async function subirImagenes(propId, urls) {
   return publicUrls;
 }
 
+// ─── DETALLE ──────────────────────────────────────────────────────────────────
 async function obtenerDetalle(page, url) {
   try {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 35000 });
@@ -144,7 +157,7 @@ async function obtenerDetalle(page, url) {
         if (urls.length > 0) { imagenes = [...new Set(urls)]; break; }
       }
 
-      // DESCRIPCIÓN — selector correcto confirmado por inspección
+      // DESCRIPCIÓN
       const descSelectors = [
         '.section-description--content',
         '[class*="section-description--content"]',
@@ -206,15 +219,19 @@ async function obtenerDetalle(page, url) {
 
       if (!superficie_m2 && superficieTerr) superficie_m2 = superficieTerr;
 
-      return { imagenes, descripcion, dormitorios, banos, superficie_m2 };
+      // INMOBILIARIA
+      const inmobiliaria = document.querySelector('#avisos-anunciante-sup')?.innerText?.trim() || null;
+
+      return { imagenes, descripcion, dormitorios, banos, superficie_m2, inmobiliaria };
     });
 
     return detalle;
   } catch (e) {
-    return { imagenes: [], descripcion: null, dormitorios: null, banos: null, superficie_m2: null };
+    return { imagenes: [], descripcion: null, dormitorios: null, banos: null, superficie_m2: null, inmobiliaria: null };
   }
 }
 
+// ─── GUARDAR ──────────────────────────────────────────────────────────────────
 async function guardarPropiedad(prop, page, ciudad, operacion) {
   if (!prop.url_origen) return;
 
@@ -227,6 +244,7 @@ async function guardarPropiedad(prop, page, ciudad, operacion) {
   const banos = detalle.banos || prop.banos;
   const superficie_m2 = detalle.superficie_m2 || prop.superficie_m2;
   const descripcion = detalle.descripcion || null;
+  const inmobiliaria = detalle.inmobiliaria || null;
 
   const { data, error } = await supabase.from('propiedades').insert([{
     titulo: prop.titulo,
@@ -239,7 +257,7 @@ async function guardarPropiedad(prop, page, ciudad, operacion) {
     banos,
     superficie_m2,
     imagenes: null,
-    inmobiliaria: null,
+    inmobiliaria,
     contacto: null,
     activo: true,
     ciudad,
@@ -259,24 +277,31 @@ async function guardarPropiedad(prop, page, ciudad, operacion) {
     }
   }
 
-  console.log(`  ✅ [${ciudad}/${operacion}] ${prop.titulo?.slice(0, 55)} | $${prop.precio} | dorm:${dormitorios} sup:${superficie_m2}`);
+  console.log(`  ✅ [${ciudad}/${operacion}] ${prop.titulo?.slice(0, 50)} | ${inmobiliaria || 'sin inmob.'} | dorm:${dormitorios} sup:${superficie_m2}`);
 }
 
-async function scrapearListado(page, ciudad, operacion) {
+// ─── LISTING ──────────────────────────────────────────────────────────────────
+async function scrapearListado(page, ciudad, operacion, tipo) {
   const propiedades = [];
 
   for (let pag = 1; pag <= MAX_PAGINAS; pag++) {
+    // Formato correcto: ?pagina-2 para página 2+
     const url = pag === 1
-      ? `https://www.argenprop.com/inmuebles/${operacion}/${ciudad.slug}`
-      : `https://www.argenprop.com/inmuebles/${operacion}/${ciudad.slug}-pagina-${pag}`;
+      ? `https://www.argenprop.com/${tipo}/${operacion}/${ciudad.slug}`
+      : `https://www.argenprop.com/${tipo}/${operacion}/${ciudad.slug}?pagina-${pag}`;
 
     try {
       await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 35000 });
       await page.waitForTimeout(2500);
 
-      const items = await page.evaluate((ciudadNombre) => {
-        const cards = [...document.querySelectorAll('.listing__item')];
+      const cantCards = await page.evaluate(() => document.querySelectorAll('.listing__item').length);
+      if (cantCards === 0) {
+        console.log(`  ⚠️ Sin resultados en pág ${pag}, fin.`);
+        break;
+      }
 
+      const items = await page.evaluate(() => {
+        const cards = [...document.querySelectorAll('.listing__item')];
         return cards.map(card => {
           const titulo = card.querySelector('.card__title')?.innerText?.trim() || null;
           const precioTexto = card.querySelector('.card__price')?.innerText?.trim() || null;
@@ -291,19 +316,13 @@ async function scrapearListado(page, ciudad, operacion) {
           const linkEl = card.querySelector('a.card, a[href*="-en-venta-"], a[href*="-en-alquiler-"]') || card.querySelector('a');
           const href = linkEl?.getAttribute('href') || null;
 
-          const textoCard = (titulo + ' ' + (direccion || '') + ' ' + (card.innerText || '')).toLowerCase();
-          const perteneceACiudad = textoCard.includes(ciudadNombre.toLowerCase());
+          return { titulo, precioTexto, direccion, dormitoriosText, banosText, superficieText, href };
+        }).filter(i => i.href && i.titulo);
+      });
 
-          return { titulo, precioTexto, direccion, dormitoriosText, banosText, superficieText, href, perteneceACiudad };
-        }).filter(i => i.href && i.titulo && i.perteneceACiudad);
-      }, ciudad.nombre);
+      if (items.length === 0) break;
 
-      if (items.length === 0) {
-        console.log(`  ⚠️ Sin propiedades de ${ciudad.nombre} en pág ${pag}, deteniendo.`);
-        break;
-      }
-
-      console.log(`  📄 ${ciudad.nombre}/${operacion} pág ${pag}: ${items.length} props`);
+      console.log(`  📄 ${ciudad.nombre}/${tipo}/${operacion} pág ${pag}: ${items.length} props`);
 
       for (const item of items) {
         const urlOrigen = item.href?.startsWith('http') ? item.href : `https://www.argenprop.com${item.href}`;
@@ -329,8 +348,9 @@ async function scrapearListado(page, ciudad, operacion) {
   return propiedades;
 }
 
+// ─── MAIN ─────────────────────────────────────────────────────────────────────
 async function main() {
-  console.log('🚀 Scraper ArgenProp — Urbix\n');
+  console.log('🚀 Scraper ArgenProp — Urbix — 8 ciudades\n');
 
   const browser = await chromium.launch({ headless: false });
   const context = await browser.newContext({
@@ -345,17 +365,19 @@ async function main() {
   try {
     for (const ciudad of CIUDADES) {
       for (const operacion of OPERACIONES) {
-        console.log(`\n📍 ${ciudad.nombre} — ${operacion.toUpperCase()}`);
-        const propiedades = await scrapearListado(page, ciudad, operacion);
-        console.log(`  Total encontradas: ${propiedades.length}`);
+        for (const tipo of TIPOS) {
+          console.log(`\n📍 ${ciudad.nombre} — ${tipo} — ${operacion.toUpperCase()}`);
+          const propiedades = await scrapearListado(page, ciudad, operacion, tipo);
+          console.log(`  Total encontradas: ${propiedades.length}`);
 
-        for (const prop of propiedades) {
-          await guardarPropiedad(prop, page, ciudad.nombre, operacion);
-          totalGuardadas++;
-          await page.waitForTimeout(1000);
+          for (const prop of propiedades) {
+            await guardarPropiedad(prop, page, ciudad.nombre, operacion);
+            totalGuardadas++;
+            await page.waitForTimeout(1000);
+          }
+
+          await page.waitForTimeout(3000);
         }
-
-        await page.waitForTimeout(3000);
       }
     }
 
