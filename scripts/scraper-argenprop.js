@@ -18,13 +18,14 @@ const BUCKET = 'propiedades-imagenes';
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const CIUDADES = [
-  { nombre: 'Chivilcoy',       slug: 'partido-de-chivilcoy' },
-  { nombre: 'Mercedes',        slug: 'partido-de-mercedes' },
-  { nombre: '25 de Mayo',      slug: 'partido-de-25-de-mayo' },
-  { nombre: '9 de Julio',      slug: 'partido-de-9-de-julio' },
-  { nombre: 'Pehuajó',         slug: 'partido-de-pehuajo' },
-  { nombre: 'Trenque Lauquen', slug: 'partido-de-trenque-lauquen' },
-  { nombre: 'Lobos',           slug: 'partido-de-lobos' },
+  // { nombre: 'Chivilcoy',       slug: 'partido-de-chivilcoy' },
+  // { nombre: 'Mercedes',        slug: 'partido-de-mercedes' },
+  // { nombre: '25 de Mayo',      slug: 'partido-de-25-de-mayo' },
+  // { nombre: '9 de Julio',      slug: 'partido-de-9-de-julio' },
+  // { nombre: 'Pehuajó',         slug: 'partido-de-pehuajo' },
+  // { nombre: 'Trenque Lauquen', slug: 'partido-de-trenque-lauquen' },
+  // { nombre: 'Lobos',           slug: 'partido-de-lobos' },
+  { nombre: 'Mar del Plata', slug: 'partido-de-general-pueyrredon' },
 ];
 
 const OPERACIONES = ['venta', 'alquiler'];
