@@ -16,7 +16,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ─── CIUDAD A SCRAPEAR — cambiá solo esta línea ───────────────────────────
-const CIUDAD = { nombre: 'Lobos', slug: 'lobos-lobos' };
+const CIUDAD = { nombre: 'Mercedes', slug: 'mercedes-mercedes' };
 // Opciones disponibles:
 // { nombre: 'Chivilcoy',       slug: 'chivilcoy-chivilcoy' }
 // { nombre: 'Mercedes',        slug: 'mercedes-mercedes' }
@@ -35,7 +35,7 @@ const OPERACIONES = [
   { tipo: 'alquiler', urlBase: URL_BASE_ALQUILER },
 ];
 
-const MAX_PAGINAS = 15;
+const MAX_PAGINAS = 18;
 
 // ─── LÍMITE DE SEGURIDAD ──────────────────────────────────────────────────
 const PAUSA_CADA     = 15;
