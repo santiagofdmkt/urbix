@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import LocalidadClient from './LocalidadClient'
@@ -15,5 +16,9 @@ export default async function LocalidadPage({ params }: { params: Promise<{ ciud
 
   if (!data || data.length === 0) return notFound()
 
-  return <LocalidadClient ciudadNombre={ciudadNombre} />
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-zinc-50" />}>
+      <LocalidadClient ciudadNombre={ciudadNombre} />
+    </Suspense>
+  )
 }
