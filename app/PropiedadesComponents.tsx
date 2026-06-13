@@ -192,24 +192,48 @@ function BotonVerMas({ restantes, onClick }: { restantes: number; onClick: () =>
 function SeccionCampos({ ciudadNombre }: { ciudadNombre: string }) {
   return (
     <section className="max-w-7xl mx-auto px-4 pb-14">
-      <div className="rounded-3xl overflow-hidden bg-gradient-to-r from-rose-500 to-pink-600 px-6 py-8 md:px-10 md:py-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
-        <div className="flex items-start gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center shrink-0">
-            <span className="text-3xl" role="img" aria-label="Campo">🌾</span>
-          </div>
-          <div>
-            <h2 className="text-white text-2xl font-bold mb-1.5">¿Buscás campos en {ciudadNombre}?</h2>
-            <p className="text-rose-50 text-sm leading-relaxed max-w-xl">
-              Campos productivos, chacras y quintas en {ciudadNombre} y la zona. Estamos sumando publicaciones rurales con superficie, ubicación y datos de contacto. Contanos qué estás buscando y te avisamos apenas tengamos opciones para vos.
-            </p>
+      <div className="relative overflow-hidden rounded-3xl shadow-xl">
+        {/* gradiente base */}
+        <div className="absolute inset-0 bg-gradient-to-r from-rose-600 via-rose-500 to-pink-600" />
+        {/* foto de campo traslucida — dejá la imagen en /public/campo.jpg */}
+        <img
+          src="/campo.jpg"
+          alt=""
+          aria-hidden="true"
+          onError={(e) => { e.currentTarget.style.display = 'none' }}
+          className="absolute inset-0 w-full h-full object-cover opacity-25"
+        />
+        {/* oscurecer hacia la izquierda para que el texto se lea */}
+        <div className="absolute inset-0 bg-gradient-to-r from-rose-900/70 via-rose-700/25 to-transparent" />
+        <div className="relative px-6 py-10 md:px-12 md:py-14">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div className="max-w-2xl">
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-white/20 backdrop-blur px-3 py-1 rounded-full mb-4">
+                <span className="text-sm leading-none">🌾</span> Próximamente en {ciudadNombre}
+              </span>
+              <h2 className="text-white text-3xl md:text-4xl font-bold leading-tight mb-3 drop-shadow">
+                ¿Buscás campos en {ciudadNombre}?
+              </h2>
+              <p className="text-rose-50 text-sm md:text-base leading-relaxed mb-6 drop-shadow-sm">
+                Campos productivos, chacras y quintas en {ciudadNombre} y la zona. Estamos sumando publicaciones rurales con superficie, ubicación y datos de contacto. Dejanos lo que buscás y te avisamos apenas tengamos opciones para vos.
+              </p>
+              <div className="flex flex-wrap gap-2.5">
+                {['Superficie y hectáreas', 'Ubicación exacta', 'Contacto directo'].map(f => (
+                  <span key={f} className="inline-flex items-center gap-1.5 text-xs font-medium text-white bg-white/15 border border-white/25 px-3 py-1.5 rounded-full">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7"/></svg>
+                    {f}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <Link
+              href={`/${encodeURIComponent(ciudadNombre)}/campos`}
+              className="shrink-0 inline-flex items-center justify-center gap-2 bg-white text-rose-600 hover:bg-rose-50 font-bold text-base px-8 py-4 rounded-full transition shadow-lg hover:-translate-y-0.5 whitespace-nowrap">
+              Ver campos en {ciudadNombre}
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7"/></svg>
+            </Link>
           </div>
         </div>
-        <Link
-          href={`/localidad/${encodeURIComponent(ciudadNombre)}/campos`}
-          className="shrink-0 inline-flex items-center gap-2 bg-white text-rose-600 hover:bg-rose-50 font-semibold text-sm px-6 py-3 rounded-full transition shadow-sm whitespace-nowrap">
-          Ver campos en {ciudadNombre}
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/></svg>
-        </Link>
       </div>
     </section>
   )
@@ -243,7 +267,7 @@ function FooterUrbix() {
             <p className="text-sm font-semibold text-zinc-300 mb-4">Localidades</p>
             <ul className="space-y-2 text-sm text-zinc-500">
               {['Chivilcoy', 'Mercedes', '25 de Mayo', '9 de Julio', 'Pehuajó', 'Trenque Lauquen', 'Lobos'].map(l => (
-                <li key={l}><Link href={'/localidad/' + encodeURIComponent(l)} className="hover:text-rose-400 transition">{l}</Link></li>
+                <li key={l}><Link href={'/' + encodeURIComponent(l)} className="hover:text-rose-400 transition">{l}</Link></li>
               ))}
             </ul>
           </div>
@@ -274,6 +298,7 @@ export function LocalidadClient({ ciudadNombre }: { ciudadNombre: string }) {
   const [loading, setLoading] = useState(true)
   const [preciosActivos, setPreciosActivos] = useState<string[]>([])
   const [mostrarTodas, setMostrarTodas] = useState(false)
+  const [query, setQuery] = useState('')
 
   const heroImg = IMAGENES_CIUDAD[ciudadNombre]
 
@@ -297,7 +322,17 @@ export function LocalidadClient({ ciudadNombre }: { ciudadNombre: string }) {
     setOperacion(op)
     setPreciosActivos([])
     setMostrarTodas(false)
-    router.replace(`/localidad/${encodeURIComponent(ciudadNombre)}?operacion=${op}`, { scroll: false })
+    router.replace(`/${encodeURIComponent(ciudadNombre)}?operacion=${op}`, { scroll: false })
+  }
+
+  function buscar() {
+    const q = query.trim()
+    if (!q) return
+    router.push('/buscar?q=' + encodeURIComponent(`${q} en ${ciudadNombre}`))
+  }
+
+  function buscarTag(tag: string) {
+    router.push('/buscar?q=' + encodeURIComponent(`${tag} en ${ciudadNombre}`))
   }
 
   function togglePrecio(label: string) {
@@ -421,6 +456,44 @@ export function LocalidadClient({ ciudadNombre }: { ciudadNombre: string }) {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* BUSCADOR — estilo home, busqueda enfocada en la ciudad */}
+      <section className="bg-gradient-to-b from-rose-50 to-zinc-50 border-y border-rose-100">
+        <div className="max-w-3xl mx-auto px-4 py-10 md:py-12">
+          <h2 className="text-center text-xl md:text-2xl font-bold text-zinc-700 leading-snug mb-6">
+            Describí lo que buscás en {ciudadNombre} con tus palabras.{' '}
+            <span className="text-zinc-400">Sin filtros complicados.</span>
+          </h2>
+          <div className="bg-white rounded-2xl shadow-lg px-3 py-2.5 flex items-center gap-2 mb-4">
+            <svg className="w-4 h-4 text-zinc-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input
+              type="text"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') buscar() }}
+              placeholder="Ej: casa con jardín, 3 dormitorios..."
+              className="flex-1 min-w-0 text-sm text-zinc-800 outline-none bg-transparent placeholder-zinc-400"
+            />
+            <button
+              onClick={buscar}
+              className="cursor-pointer bg-rose-500 hover:bg-rose-600 text-white text-sm font-semibold px-5 py-2 rounded-xl transition shrink-0">
+              Buscar
+            </button>
+          </div>
+          <div className="flex flex-wrap justify-center gap-2">
+            {['Casas', 'Departamentos', 'Terrenos', 'Quintas', 'Locales'].map(f => (
+              <button
+                key={f}
+                onClick={() => buscarTag(f)}
+                className="cursor-pointer text-xs px-3.5 py-1.5 rounded-full border border-zinc-200 bg-white text-zinc-600 hover:border-rose-400 hover:text-rose-500 transition">
+                {f}
+              </button>
+            ))}
           </div>
         </div>
       </section>
@@ -549,7 +622,7 @@ export function PropiedadesClient() {
         />
         <div className="flex flex-wrap gap-2 mb-8">
           {CIUDADES.map(ciudad => (
-            <Link key={ciudad} href={'/localidad/' + encodeURIComponent(ciudad)} className="text-xs px-4 py-2 rounded-full border border-zinc-200 bg-white text-zinc-600 hover:border-rose-400 hover:text-rose-500 transition font-medium">
+            <Link key={ciudad} href={'/' + encodeURIComponent(ciudad)} className="text-xs px-4 py-2 rounded-full border border-zinc-200 bg-white text-zinc-600 hover:border-rose-400 hover:text-rose-500 transition font-medium">
               {ciudad}
             </Link>
           ))}

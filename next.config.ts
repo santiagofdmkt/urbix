@@ -8,6 +8,15 @@ const nextConfig: NextConfig = {
       'imgar.zonapropcdn.com',
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/localidad/:ciudad',
+        destination: '/:ciudad',
+        permanent: true,
+      },
+    ]
+  },
 };
 
 export default nextConfig;

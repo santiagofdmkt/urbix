@@ -393,7 +393,7 @@ export default async function Home() {
               const tiene = cant > 0
               const foto = FOTOS_LOCALIDADES[loc.nombre] || DEFAULT_FOTO
               return (
-                <Link key={loc.nombre} href={tiene ? '/localidad/' + encodeURIComponent(loc.nombre) : '#'}
+                <Link key={loc.nombre} href={tiene ? '/' + encodeURIComponent(loc.nombre) : '#'}
                   className={`relative rounded-2xl overflow-hidden group cursor-pointer ${tiene ? 'hover:shadow-lg' : 'opacity-70 pointer-events-none'} transition`}>
                   <div className="h-28 relative">
                     <img src={foto} alt={loc.nombre} className={`w-full h-full object-cover ${tiene ? 'group-hover:scale-105' : 'grayscale'} transition duration-500`} />
@@ -474,7 +474,7 @@ export default async function Home() {
               const foto = FOTOS_LOCALIDADES[loc.nombre] || DEFAULT_FOTO
               const tiene = cant > 0
               return (
-                <Link key={loc.nombre} href={tiene ? '/localidad/' + encodeURIComponent(loc.nombre) : '#'}
+                <Link key={loc.nombre} href={tiene ? '/' + encodeURIComponent(loc.nombre) : '#'}
                   className={`group relative rounded-3xl overflow-hidden block ${tiene ? 'hover:shadow-xl' : 'opacity-50 pointer-events-none'} transition-all duration-300`}>
                   <div className="h-48 md:h-56 relative overflow-hidden">
                     <img src={foto} alt={loc.nombre} className="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
@@ -525,7 +525,7 @@ export default async function Home() {
               <p className="text-sm font-semibold text-zinc-300 mb-4">Localidades</p>
               <ul className="space-y-2 text-sm text-zinc-500">
                 {['Chivilcoy', 'Mercedes', '25 de Mayo', '9 de Julio', 'Pehuajó', 'Trenque Lauquen', 'Lobos'].map(l => (
-                  <li key={l}><Link href={'/localidad/' + encodeURIComponent(l)} className="hover:text-rose-400 transition">{l}</Link></li>
+                  <li key={l}><Link href={'/' + encodeURIComponent(l)} className="hover:text-rose-400 transition">{l}</Link></li>
                 ))}
               </ul>
             </div>
