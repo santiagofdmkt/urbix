@@ -95,6 +95,7 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-white font-sans w-full overflow-x-hidden">
+      <span id="top" />
 
       {/* NAV */}
       <header className="bg-white border-b border-zinc-100 sticky top-0 z-50 w-full">
@@ -103,6 +104,7 @@ export default async function Home() {
           <nav className="hidden md:flex items-center gap-6 text-sm">
             <a href="#comprar" className="text-zinc-500 hover:text-zinc-800 transition">Comprar</a>
             <a href="#alquiler" className="text-zinc-500 hover:text-zinc-800 transition">Alquilar</a>
+            <a href="#campos" className="text-zinc-500 hover:text-zinc-800 transition">Campos del interior</a>
             <Link href="/soy-inmobiliaria" className="text-zinc-500 hover:text-zinc-800 transition font-medium">Soy inmobiliaria</Link>
           </nav>
           <div className="hidden md:flex items-center gap-3">
@@ -127,12 +129,17 @@ export default async function Home() {
       <section className="relative py-12 md:py-20 px-4 text-center overflow-hidden w-full"
         style={{ background: "linear-gradient(135deg, #fff1f2 0%, #fce7f3 50%, #ede9fe 100%)" }}>
         <p className="text-xs font-bold tracking-widest text-rose-400 uppercase mb-4">Buscador inmobiliario con IA</p>
-        <h1 className="text-4xl md:text-6xl font-bold text-zinc-900 leading-tight mb-3">
+        <h1 className="text-4xl md:text-6xl font-bold text-zinc-900 leading-tight mb-4">
           Buscá propiedades<br />
           <span className="text-rose-500 italic">como te las imaginás</span>
         </h1>
+        <div className="mb-5">
+          <span className="inline-flex items-center gap-1.5 text-xs md:text-sm font-semibold text-rose-600 bg-white/70 border border-rose-200 px-4 py-1.5 rounded-full shadow-sm">
+            📍 Pensado para el interior del país
+          </span>
+        </div>
         <p className="text-base md:text-lg text-zinc-500 max-w-lg mx-auto mb-8">
-          Describí lo que buscás con tus palabras. Sin filtros complicados.
+          Casas, departamentos y campos en el interior bonaerense. Describí lo que buscás con tus palabras, sin filtros complicados.
         </p>
         <div className="max-w-2xl mx-auto w-full">
           <BotonesHero />
@@ -240,6 +247,57 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* PROPIEDADES POR ZONA */}
+      <section className="bg-zinc-50 py-12 w-full overflow-x-hidden">
+        <div className="max-w-7xl mx-auto px-4">
+          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Cobertura regional</p>
+          <h2 className="text-2xl font-bold text-zinc-900 mb-8">Propiedades por zona</h2>
+
+          {/* Provincia de Buenos Aires (interior) — con localidades que se van cargando */}
+          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Provincia de Buenos Aires</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-12">
+            {LOCALIDADES.map(loc => {
+              const cant = conteoXCiudad[loc.nombre] || 0
+              const tiene = cant > 0
+              const foto = FOTOS_LOCALIDADES[loc.nombre] || DEFAULT_FOTO
+              return (
+                <Link key={loc.nombre} href={tiene ? '/' + encodeURIComponent(loc.nombre) : '#'}
+                  className={`relative rounded-2xl overflow-hidden group cursor-pointer ${tiene ? 'hover:shadow-lg' : 'opacity-70 pointer-events-none'} transition`}>
+                  <div className="h-28 relative">
+                    <img src={foto} alt={loc.nombre} className={`w-full h-full object-cover ${tiene ? 'group-hover:scale-105' : 'grayscale'} transition duration-500`} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                    {!tiene && <div className="absolute top-2 right-2 bg-zinc-700/80 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">Próximamente</div>}
+                    {tiene && <div className="absolute top-2 right-2 bg-rose-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">{cant} prop.</div>}
+                  </div>
+                  <div className="absolute bottom-0 left-0 right-0 p-2">
+                    <p className="text-white text-xs font-semibold leading-tight">{loc.nombre}</p>
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+
+          {/* Otras provincias y regiones — una sola tarjeta por zona, en "Proximamente" */}
+          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Otras provincias y regiones</p>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+            {REGIONES_PROXIMAMENTE.map(reg => (
+              <div key={reg.nombre} className="relative rounded-2xl overflow-hidden opacity-80 cursor-default">
+                <div className="h-28 relative">
+                  <img src={reg.foto} alt={reg.nombre} className="w-full h-full object-cover grayscale" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/20" />
+                  <div className="absolute top-2 right-2 bg-zinc-700/80 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                    Próximamente
+                  </div>
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 p-2">
+                  <p className="text-white text-xs font-semibold leading-tight">{reg.nombre}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* PROPIEDADES EN VENTA */}
       <section id="comprar" className="max-w-7xl mx-auto px-4 py-10 w-full">
         <div className="flex items-center justify-between mb-5">
@@ -329,57 +387,6 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* PROPIEDADES POR ZONA */}
-      <section className="bg-zinc-50 py-12 w-full overflow-x-hidden">
-        <div className="max-w-7xl mx-auto px-4">
-          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Cobertura regional</p>
-          <h2 className="text-2xl font-bold text-zinc-900 mb-8">Propiedades por zona</h2>
-
-          {/* Provincia de Buenos Aires (interior) — con localidades que se van cargando */}
-          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Provincia de Buenos Aires</p>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-12">
-            {LOCALIDADES.map(loc => {
-              const cant = conteoXCiudad[loc.nombre] || 0
-              const tiene = cant > 0
-              const foto = FOTOS_LOCALIDADES[loc.nombre] || DEFAULT_FOTO
-              return (
-                <Link key={loc.nombre} href={tiene ? '/' + encodeURIComponent(loc.nombre) : '#'}
-                  className={`relative rounded-2xl overflow-hidden group cursor-pointer ${tiene ? 'hover:shadow-lg' : 'opacity-70 pointer-events-none'} transition`}>
-                  <div className="h-28 relative">
-                    <img src={foto} alt={loc.nombre} className={`w-full h-full object-cover ${tiene ? 'group-hover:scale-105' : 'grayscale'} transition duration-500`} />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                    {!tiene && <div className="absolute top-2 right-2 bg-zinc-700/80 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">Próximamente</div>}
-                    {tiene && <div className="absolute top-2 right-2 bg-rose-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">{cant} prop.</div>}
-                  </div>
-                  <div className="absolute bottom-0 left-0 right-0 p-2">
-                    <p className="text-white text-xs font-semibold leading-tight">{loc.nombre}</p>
-                  </div>
-                </Link>
-              )
-            })}
-          </div>
-
-          {/* Otras provincias y regiones — una sola tarjeta por zona, en "Proximamente" */}
-          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Otras provincias y regiones</p>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-            {REGIONES_PROXIMAMENTE.map(reg => (
-              <div key={reg.nombre} className="relative rounded-2xl overflow-hidden opacity-80 cursor-default">
-                <div className="h-28 relative">
-                  <img src={reg.foto} alt={reg.nombre} className="w-full h-full object-cover grayscale" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/20" />
-                  <div className="absolute top-2 right-2 bg-zinc-700/80 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
-                    Próximamente
-                  </div>
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 p-2">
-                  <p className="text-white text-xs font-semibold leading-tight">{reg.nombre}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* PROPIEDADES RECIENTES */}
       <section id="todas" className="max-w-7xl mx-auto px-4 py-12 w-full">
         <div className="flex items-center justify-between mb-6">
@@ -457,9 +464,66 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* FOOTER */}
+      {/* CAMPOS DEL INTERIOR */}
+      <section id="campos" className="max-w-7xl mx-auto px-4 pb-16 pt-4 scroll-mt-20 w-full">
+        <div className="relative overflow-hidden rounded-3xl shadow-xl">
+          {/* gradiente base */}
+          <div className="absolute inset-0 bg-gradient-to-r from-rose-600 via-rose-500 to-pink-600" />
+          {/* foto de campo translucida (Unsplash, sin dependencia de archivos locales) */}
+          <img
+            src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80"
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full object-cover opacity-30"
+          />
+          {/* oscurecer hacia la izquierda para que el texto se lea */}
+          <div className="absolute inset-0 bg-gradient-to-r from-rose-900/70 via-rose-700/25 to-transparent" />
+          <div className="relative px-6 py-10 md:px-12 md:py-14">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+              <div className="max-w-2xl">
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-white/20 backdrop-blur px-3 py-1 rounded-full mb-4">
+                  <span className="text-sm leading-none">🌾</span> Campos del interior
+                </span>
+                <h2 className="text-white text-3xl md:text-4xl font-bold leading-tight mb-3 drop-shadow">
+                  ¿Buscás campos en el interior?
+                </h2>
+                <p className="text-rose-50 text-sm md:text-base leading-relaxed mb-6 drop-shadow-sm">
+                  Campos productivos, chacras y quintas en el interior bonaerense y la zona. Sumamos publicaciones rurales con superficie, ubicación y datos de contacto. Encontrá la tierra que estás buscando.
+                </p>
+                <div className="flex flex-wrap gap-2.5">
+                  {['Superficie y hectáreas', 'Ubicación exacta', 'Contacto directo'].map(f => (
+                    <span key={f} className="inline-flex items-center gap-1.5 text-xs font-medium text-white bg-white/15 border border-white/25 px-3 py-1.5 rounded-full">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7"/></svg>
+                      {f}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <Link
+                href="/campos"
+                className="shrink-0 inline-flex items-center justify-center gap-2 bg-white text-rose-600 hover:bg-rose-50 font-bold text-base px-8 py-4 rounded-full transition shadow-lg hover:-translate-y-0.5 whitespace-nowrap">
+                Ver campos disponibles
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7"/></svg>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+     {/* FOOTER */}
       <footer className="bg-zinc-900 text-white pt-16 pb-8 w-full">
         <div className="max-w-7xl mx-auto px-4">
+
+          {/* Boton volver arriba */}
+          <div className="flex flex-col items-center mb-12">
+            <a href="#top" aria-label="Volver arriba" className="group flex items-center justify-center w-14 h-14 rounded-full bg-rose-500 hover:bg-rose-600 shadow-lg shadow-rose-500/30 transition hover:-translate-y-1">
+              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 15l7-7 7 7"/>
+              </svg>
+            </a>
+            <a href="#top" className="text-xs text-zinc-400 hover:text-rose-400 mt-3 transition font-medium">Volver arriba</a>
+          </div>
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
             <div className="col-span-2 md:col-span-1">
               <p className="text-2xl font-bold text-rose-400 mb-3">urbix</p>
