@@ -36,6 +36,26 @@ const REGIONES_PROXIMAMENTE: { nombre: string; foto: string }[] = [
 
 const DEFAULT_FOTO = 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&q=80'
 
+// Encabezado de seccion: eyebrow espaciado arriba + titulo grande con linea editorial al costado.
+// Se ve bien en mobile y desktop. La linea se oculta en mobile para que el titulo respire.
+function SectionHeading({ eyebrow, titulo, acento = 'rose' }: { eyebrow: string; titulo: string; acento?: 'rose' | 'blue' | 'emerald' }) {
+  const texto = acento === 'blue' ? 'text-blue-500' : acento === 'emerald' ? 'text-emerald-600' : 'text-rose-500'
+  const linea = acento === 'blue' ? 'bg-blue-200' : acento === 'emerald' ? 'bg-emerald-200' : 'bg-rose-200'
+  return (
+    <div className="mb-7">
+      <p className={`text-[11px] font-bold uppercase mb-3 ${texto}`} style={{ letterSpacing: '0.28em' }}>
+        {eyebrow}
+      </p>
+      <div className="flex items-center gap-4">
+        <h2 className="text-2xl md:text-3xl font-bold text-zinc-900 tracking-tight shrink-0">
+          {titulo}
+        </h2>
+        <span className={`hidden sm:block h-px flex-1 ${linea} rounded-full`} />
+      </div>
+    </div>
+  )
+}
+
 export default async function Home() {
   const { data: raw } = await supabase
     .from('propiedades')
@@ -167,11 +187,10 @@ export default async function Home() {
       {/* PROPIEDADES POR ZONA */}
       <section className="bg-zinc-50 py-12 w-full overflow-x-hidden">
         <div className="max-w-7xl mx-auto px-4">
-          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Cobertura regional</p>
-          <h2 className="text-2xl font-bold text-zinc-900 mb-8">Propiedades por zona</h2>
+          <SectionHeading eyebrow="Cobertura regional" titulo="Propiedades por zona" />
 
           {/* Provincia de Buenos Aires (interior) — con localidades que se van cargando */}
-          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Provincia de Buenos Aires</p>
+          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3 mt-8">Provincia de Buenos Aires</p>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-12">
             {LOCALIDADES.map(loc => {
               const cant = conteoXCiudad[loc.nombre] || 0
@@ -217,12 +236,12 @@ export default async function Home() {
 
       {/* PROPIEDADES EN VENTA */}
       <section id="comprar" className="max-w-7xl mx-auto px-4 py-10 w-full">
-        <div className="flex items-center justify-between mb-5">
-          <div>
-            <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Nuevas y destacadas</p>
-            <h2 className="text-2xl font-bold text-zinc-900">Lo último disponible</h2>
-          </div>
-          <Link href="/propiedades?operacion=venta" className="text-sm text-rose-500 hover:underline font-medium shrink-0">Ver más →</Link>
+        <div className="flex items-end justify-between gap-4 mb-6">
+          <SectionHeading eyebrow="Nuevas y destacadas" titulo="Lo último disponible" />
+          <Link href="/propiedades?operacion=venta" className="shrink-0 inline-flex items-center gap-1.5 text-sm font-semibold text-rose-500 border border-rose-200 hover:bg-rose-500 hover:text-white px-4 py-2 rounded-full transition mb-1">
+            Ver más
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7"/></svg>
+          </Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {destacadas.map(p => {
@@ -258,12 +277,12 @@ export default async function Home() {
       {/* PROPIEDADES EN ALQUILER */}
       <section id="alquiler" className="bg-zinc-50 w-full py-10">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between mb-5">
-            <div>
-              <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Disponibles ahora</p>
-              <h2 className="text-2xl font-bold text-zinc-900">Propiedades en alquiler</h2>
-            </div>
-            <Link href="/propiedades?operacion=alquiler" className="text-sm text-rose-500 hover:underline font-medium shrink-0">Ver más →</Link>
+          <div className="flex items-end justify-between gap-4 mb-6">
+            <SectionHeading eyebrow="Disponibles ahora" titulo="Propiedades en alquiler" acento="blue" />
+            <Link href="/propiedades?operacion=alquiler" className="shrink-0 inline-flex items-center gap-1.5 text-sm font-semibold text-blue-500 border border-blue-200 hover:bg-blue-500 hover:text-white px-4 py-2 rounded-full transition mb-1">
+              Ver más
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7"/></svg>
+            </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {alquileres.map(p => {
@@ -306,13 +325,8 @@ export default async function Home() {
 
       {/* PROPIEDADES RECIENTES */}
       <section id="todas" className="max-w-7xl mx-auto px-4 py-12 w-full">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Propiedades recientes</p>
-            <h2 className="text-2xl font-bold text-zinc-900">Últimas incorporaciones</h2>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <SectionHeading eyebrow="Propiedades recientes" titulo="Últimas incorporaciones" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
           {recientes.map(p => {
             const img = getImg(p.imagenes)
             if (!img) return null
@@ -348,8 +362,7 @@ export default async function Home() {
       {/* EXPLORÁ POR LOCALIDAD */}
       <section className="bg-gradient-to-br from-rose-50 to-white py-16 w-full">
         <div className="max-w-7xl mx-auto px-4">
-          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Dónde encontramos propiedades</p>
-          <h2 className="text-2xl font-bold text-zinc-900 mb-2">Explorá por localidad</h2>
+          <SectionHeading eyebrow="Dónde encontramos propiedades" titulo="Explorá por localidad" />
           <p className="text-sm text-zinc-400 mb-8 max-w-lg">Cobertura real en el interior bonaerense. Hacé clic en tu ciudad para ver todas las propiedades disponibles.</p>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {LOCALIDADES.map(loc => {
@@ -384,8 +397,8 @@ export default async function Home() {
       {/* CAMPOS DEL INTERIOR */}
       <section id="campos" className="max-w-7xl mx-auto px-4 pb-16 pt-4 scroll-mt-20 w-full">
         <div className="relative overflow-hidden rounded-3xl shadow-xl">
-          {/* gradiente base */}
-          <div className="absolute inset-0 bg-gradient-to-r from-rose-600 via-rose-500 to-pink-600" />
+          {/* gradiente base verde */}
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-700 via-emerald-600 to-green-600" />
           {/* foto de campo translucida (Unsplash, sin dependencia de archivos locales) */}
           <img
             src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80"
@@ -394,7 +407,7 @@ export default async function Home() {
             className="absolute inset-0 w-full h-full object-cover opacity-30"
           />
           {/* oscurecer hacia la izquierda para que el texto se lea */}
-          <div className="absolute inset-0 bg-gradient-to-r from-rose-900/70 via-rose-700/25 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/70 via-emerald-800/25 to-transparent" />
           <div className="relative px-6 py-10 md:px-12 md:py-14">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
               <div className="max-w-2xl">
@@ -404,7 +417,7 @@ export default async function Home() {
                 <h2 className="text-white text-3xl md:text-4xl font-bold leading-tight mb-3 drop-shadow">
                   ¿Buscás campos en el interior?
                 </h2>
-                <p className="text-rose-50 text-sm md:text-base leading-relaxed mb-6 drop-shadow-sm">
+                <p className="text-emerald-50 text-sm md:text-base leading-relaxed mb-6 drop-shadow-sm">
                   Campos productivos, chacras y quintas en el interior bonaerense y la zona. Sumamos publicaciones rurales con superficie, ubicación y datos de contacto. Encontrá la tierra que estás buscando.
                 </p>
                 <div className="flex flex-wrap gap-2.5">
@@ -418,7 +431,7 @@ export default async function Home() {
               </div>
               <Link
                 href="/campos"
-                className="shrink-0 inline-flex items-center justify-center gap-2 bg-white text-rose-600 hover:bg-rose-50 font-bold text-base px-8 py-4 rounded-full transition shadow-lg hover:-translate-y-0.5 whitespace-nowrap">
+                className="shrink-0 inline-flex items-center justify-center gap-2 bg-white text-emerald-700 hover:bg-emerald-50 font-bold text-base px-8 py-4 rounded-full transition shadow-lg hover:-translate-y-0.5 whitespace-nowrap">
                 Ver campos disponibles
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7"/></svg>
               </Link>
