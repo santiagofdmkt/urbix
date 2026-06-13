@@ -358,9 +358,7 @@ export function LocalidadClient({ ciudadNombre }: { ciudadNombre: string }) {
             <span className="block text-5xl md:text-6xl tracking-tight">{ciudadNombre}</span>
           </h1>
           <p className="text-slate-100 text-base md:text-lg leading-relaxed mb-7 max-w-xl drop-shadow-sm">
-            {loading
-              ? `Casas, departamentos, terrenos y campos en ${ciudadNombre} y la zona.`
-              : `Buscá entre ${todas.length} publicaciones de ${ciudadNombre} y la zona, sin filtros complicados.`}
+            Casas, departamentos, terrenos y campos en {ciudadNombre} y la zona. Encontralos sin filtros complicados.
           </p>
           <div className="flex flex-wrap gap-3">
             <a href="#listado" className="bg-rose-500 hover:bg-rose-600 text-white text-sm font-semibold px-7 py-3.5 rounded-full transition shadow-md">
@@ -387,7 +385,7 @@ export function LocalidadClient({ ciudadNombre }: { ciudadNombre: string }) {
                 </p>
                 <div className="flex flex-wrap gap-2.5">
                   <div className="flex items-center gap-2.5 bg-white border border-rose-100 rounded-xl px-3.5 py-2 shadow-sm">
-                    <span className="text-xl font-bold text-rose-500 leading-none">{loading ? '—' : todas.length}</span>
+                    <span className="text-xl font-bold text-rose-500 leading-none tabular-nums inline-block min-w-[2.5ch] text-center">{loading ? '—' : todas.length}</span>
                     <span className="text-[11px] text-zinc-500 leading-tight">propiedades<br/>activas</span>
                   </div>
                   <div className="flex items-center gap-2 bg-white border border-rose-100 rounded-xl px-3.5 py-2 shadow-sm">
