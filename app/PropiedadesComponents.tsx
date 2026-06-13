@@ -23,7 +23,8 @@ interface Propiedad {
   ciudad: string | null
 }
 
-const LIMITE_VISIBLE = 24
+const LIMITE_MOBILE = 7
+const LIMITE_DESKTOP = 24
 
 const CIUDADES = ['Chivilcoy', 'Mercedes', '25 de Mayo', '9 de Julio', 'Pehuajó', 'Trenque Lauquen', 'Lobos']
 
@@ -45,6 +46,20 @@ const LOCALIDADES_CARDS: Record<string, { img: string; props: number | null }> =
   'Pehuajó':         { img: '/localidades/pehuajo.jpg',         props: null },
   'Trenque Lauquen': { img: '/localidades/trenque-lauquen.jpg', props: null },
   'Lobos':           { img: '/localidades/lobos.jpg',           props: 271 },
+}
+
+// Detecta si estamos en viewport mobile (< 768px, breakpoint md de Tailwind).
+// Sirve para mostrar 7 propiedades en mobile y LIMITE_DESKTOP en escritorio.
+function useEsMobile(): boolean {
+  const [esMobile, setEsMobile] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)')
+    const update = () => setEsMobile(mq.matches)
+    update()
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [])
+  return esMobile
 }
 
 function parseImg(raw: any): string | null {
@@ -113,28 +128,29 @@ function Filtros({ operacion, onCambiarOperacion, cantVenta, cantAlquiler, preci
   onCambiarOrden: (o: Orden) => void
   loading: boolean
 }) {
+  const [precioAbierto, setPrecioAbierto] = useState(false)
   return (
     <div className="flex flex-col gap-3 mb-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center bg-white border border-zinc-200 rounded-full p-1 shadow-sm">
-        <button
-          onClick={() => onCambiarOperacion('venta')}
-          className={`cursor-pointer flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${operacion === 'venta' ? 'bg-rose-500 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-800'}`}
-        >
-          Comprar
-          {!loading && cantVenta > 0 && (
-            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${operacion === 'venta' ? 'bg-rose-400 text-white' : 'bg-zinc-100 text-zinc-500'}`}>{cantVenta}</span>
-          )}
-        </button>
-        <button
-          onClick={() => onCambiarOperacion('alquiler')}
-          className={`cursor-pointer flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${operacion === 'alquiler' ? 'bg-blue-500 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-800'}`}
-        >
-          Alquilar
-          {!loading && cantAlquiler > 0 && (
-            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${operacion === 'alquiler' ? 'bg-blue-400 text-white' : 'bg-zinc-100 text-zinc-500'}`}>{cantAlquiler}</span>
-          )}
-        </button>
+          <button
+            onClick={() => onCambiarOperacion('venta')}
+            className={`cursor-pointer flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${operacion === 'venta' ? 'bg-rose-500 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-800'}`}
+          >
+            Comprar
+            {!loading && cantVenta > 0 && (
+              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${operacion === 'venta' ? 'bg-rose-400 text-white' : 'bg-zinc-100 text-zinc-500'}`}>{cantVenta}</span>
+            )}
+          </button>
+          <button
+            onClick={() => onCambiarOperacion('alquiler')}
+            className={`cursor-pointer flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${operacion === 'alquiler' ? 'bg-blue-500 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-800'}`}
+          >
+            Alquilar
+            {!loading && cantAlquiler > 0 && (
+              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${operacion === 'alquiler' ? 'bg-blue-400 text-white' : 'bg-zinc-100 text-zinc-500'}`}>{cantAlquiler}</span>
+            )}
+          </button>
         </div>
         <div className="flex items-center gap-2">
           <label htmlFor="orden" className="text-xs text-zinc-400 hidden sm:block">Ordenar por</label>
@@ -153,7 +169,24 @@ function Filtros({ operacion, onCambiarOperacion, cantVenta, cantAlquiler, preci
           </div>
         </div>
       </div>
-      <div className="flex flex-wrap gap-2">
+
+      {/* Boton colapsable para el filtro de precio (ahorra espacio en mobile y escritorio) */}
+      <button
+        onClick={() => setPrecioAbierto(v => !v)}
+        className="cursor-pointer flex items-center justify-between w-full sm:w-auto bg-white border border-zinc-200 rounded-full pl-5 pr-4 py-2.5 text-sm font-semibold text-zinc-600 shadow-sm sm:self-start"
+      >
+        <span className="flex items-center gap-2">
+          <svg className="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h18M6 8h12M10 12h4M11 16h2"/></svg>
+          Filtrar por precio
+          {preciosActivos.length > 0 && (
+            <span className="bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{preciosActivos.length}</span>
+          )}
+        </span>
+        <svg className={`w-4 h-4 text-zinc-400 transition-transform duration-200 sm:ml-3 ${precioAbierto ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/></svg>
+      </button>
+
+      {/* Chips de precio: solo visibles si el panel esta abierto (mobile y escritorio) */}
+      <div className={`${precioAbierto ? 'flex' : 'hidden'} flex-wrap gap-2`}>
         {RANGOS.map(r => {
           const activo = preciosActivos.includes(r.label)
           return (
@@ -217,7 +250,8 @@ function ordenarPropiedades(props: Propiedad[], orden: Orden): Propiedad[] {
   return props
 }
 
-function BotonVerMas({ restantes, onClick }: { restantes: number; onClick: () => void }) {
+function BotonVerMas({ mostrados, total, onClick }: { mostrados: number; total: number; onClick: () => void }) {
+  const restantes = total - mostrados
   return (
     <div className="flex flex-col items-center mt-12 gap-3">
       <button
@@ -227,7 +261,7 @@ function BotonVerMas({ restantes, onClick }: { restantes: number; onClick: () =>
         <span className="bg-white/20 text-white text-sm font-semibold px-2.5 py-0.5 rounded-full">+{restantes}</span>
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7"/></svg>
       </button>
-      <span className="text-xs text-zinc-400">Mostrando 24 de {restantes + LIMITE_VISIBLE}</span>
+      <span className="text-xs text-zinc-400">Mostrando {mostrados} de {total}</span>
     </div>
   )
 }
@@ -299,9 +333,12 @@ function SeccionOtrasLocalidades({ ciudadNombre }: { ciudadNombre: string }) {
       <h2 className="text-2xl md:text-3xl font-bold text-zinc-900 mb-2">Explorá otras localidades</h2>
       <p className="text-zinc-500 text-sm mb-7 max-w-xl">Sumamos propiedades del interior bonaerense. Elegí otra ciudad para ver lo que hay disponible.</p>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {otras.map(c => {
+        {otras.map((c, idx) => {
           const info = LOCALIDADES_CARDS[c] || { img: '', props: null }
           const activa = info.props != null
+          // En mobile mostramos solo 5 ciudades + la tarjeta "tu ciudad no esta" = 6 tarjetas (simetria 2x3).
+          // La 6ta ciudad se oculta solo en mobile y reaparece desde md en adelante.
+          const ocultarEnMobile = idx >= 5
           const inner = (
             <>
               <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900" />
@@ -338,11 +375,11 @@ function SeccionOtrasLocalidades({ ciudadNombre }: { ciudadNombre: string }) {
             </>
           )
           return activa ? (
-            <Link key={c} href={'/' + encodeURIComponent(c)} className="group relative block overflow-hidden rounded-2xl h-44 md:h-48 shadow-sm hover:shadow-lg transition">
+            <Link key={c} href={'/' + encodeURIComponent(c)} className={`group relative ${ocultarEnMobile ? 'hidden md:block' : 'block'} overflow-hidden rounded-2xl h-44 md:h-48 shadow-sm hover:shadow-lg transition`}>
               {inner}
             </Link>
           ) : (
-            <div key={c} className="relative overflow-hidden rounded-2xl h-44 md:h-48 shadow-sm">
+            <div key={c} className={`relative ${ocultarEnMobile ? 'hidden md:block' : ''} overflow-hidden rounded-2xl h-44 md:h-48 shadow-sm`}>
               {inner}
             </div>
           )
@@ -422,6 +459,9 @@ export function LocalidadClient({ ciudadNombre }: { ciudadNombre: string }) {
   const [orden, setOrden] = useState<Orden>('recientes')
   const [query, setQuery] = useState('')
 
+  const esMobile = useEsMobile()
+  const limite = esMobile ? LIMITE_MOBILE : LIMITE_DESKTOP
+
   const heroImg = IMAGENES_CIUDAD[ciudadNombre]
 
   useEffect(() => {
@@ -467,8 +507,7 @@ export function LocalidadClient({ ciudadNombre }: { ciudadNombre: string }) {
   const porOperacion = todas.filter(p => p.operacion === operacion)
   const filtradas = filtrarPorPrecios(porOperacion, preciosActivos)
   const ordenadas = ordenarPropiedades(filtradas, orden)
-  const visibles = mostrarTodas ? ordenadas : ordenadas.slice(0, LIMITE_VISIBLE)
-  const restantes = ordenadas.length - LIMITE_VISIBLE
+  const visibles = mostrarTodas ? ordenadas : ordenadas.slice(0, limite)
   const cantVenta = todas.filter(p => p.operacion === 'venta').length
   const cantAlquiler = todas.filter(p => p.operacion === 'alquiler').length
 
@@ -640,8 +679,8 @@ export function LocalidadClient({ ciudadNombre }: { ciudadNombre: string }) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {visibles.map(p => <PropCard key={p.id} p={p} operacion={operacion} />)}
             </div>
-            {!mostrarTodas && restantes > 0 && (
-              <BotonVerMas restantes={restantes} onClick={() => setMostrarTodas(true)} />
+            {!mostrarTodas && ordenadas.length > limite && (
+              <BotonVerMas mostrados={limite} total={ordenadas.length} onClick={() => setMostrarTodas(true)} />
             )}
           </>
         )}
@@ -666,6 +705,9 @@ export function PropiedadesClient() {
   const [preciosActivos, setPreciosActivos] = useState<string[]>([])
   const [mostrarTodas, setMostrarTodas] = useState(false)
   const [orden, setOrden] = useState<Orden>('recientes')
+
+  const esMobile = useEsMobile()
+  const limite = esMobile ? LIMITE_MOBILE : LIMITE_DESKTOP
 
   useEffect(() => {
     async function fetchProps() {
@@ -699,8 +741,7 @@ export function PropiedadesClient() {
   const porOperacion = todas.filter(p => p.operacion === operacion)
   const filtradas = filtrarPorPrecios(porOperacion, preciosActivos)
   const ordenadas = ordenarPropiedades(filtradas, orden)
-  const visibles = mostrarTodas ? ordenadas : ordenadas.slice(0, LIMITE_VISIBLE)
-  const restantes = ordenadas.length - LIMITE_VISIBLE
+  const visibles = mostrarTodas ? ordenadas : ordenadas.slice(0, limite)
   const cantVenta = todas.filter(p => p.operacion === 'venta').length
   const cantAlquiler = todas.filter(p => p.operacion === 'alquiler').length
 
@@ -760,8 +801,8 @@ export function PropiedadesClient() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {visibles.map(p => <PropCard key={p.id} p={p} operacion={operacion} mostrarCiudad />)}
             </div>
-            {!mostrarTodas && restantes > 0 && (
-              <BotonVerMas restantes={restantes} onClick={() => setMostrarTodas(true)} />
+            {!mostrarTodas && ordenadas.length > limite && (
+              <BotonVerMas mostrados={limite} total={ordenadas.length} onClick={() => setMostrarTodas(true)} />
             )}
           </>
         )}
