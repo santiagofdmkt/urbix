@@ -25,7 +25,7 @@ interface Propiedad {
 const LIMITE_VISIBLE = 24
 
 // Foto de cada ciudad para el hero. Dejá la imagen en /public/localidades/<ciudad>.jpg
-// Si no existe, el hero queda con el degradado rose igual (no rompe nada).
+// Si no existe, el hero queda con el fondo azul noche igual (no rompe nada).
 const IMAGENES_CIUDAD: Record<string, string> = {
   'Chivilcoy': '/localidades/chivilcoy.jpg',
 }
@@ -78,9 +78,11 @@ function PropCard({ p, operacion, mostrarCiudad = false }: { p: Propiedad; opera
 const RANGOS = [
   { label: 'Hasta USD 50k',   min: 0,      max: 50000 },
   { label: 'USD 50k – 100k',  min: 50000,  max: 100000 },
-  { label: 'USD 100k – 200k', min: 100000, max: 200000 },
-  { label: 'USD 200k – 500k', min: 200000, max: 500000 },
-  { label: 'Más de USD 500k', min: 500000, max: Infinity },
+  { label: 'USD 100k – 150k', min: 100000, max: 150000 },
+  { label: 'USD 150k – 200k', min: 150000, max: 200000 },
+  { label: 'USD 200k – 250k', min: 200000, max: 250000 },
+  { label: 'USD 250k – 350k', min: 250000, max: 350000 },
+  { label: 'Más de USD 350k', min: 350000, max: Infinity },
 ]
 
 function Filtros({ operacion, onCambiarOperacion, cantVenta, cantAlquiler, preciosActivos, onTogglePrecio, loading }: {
@@ -193,10 +195,7 @@ function SeccionCampos({ ciudadNombre }: { ciudadNombre: string }) {
       <div className="rounded-3xl overflow-hidden bg-gradient-to-r from-rose-500 to-pink-600 px-6 py-8 md:px-10 md:py-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
         <div className="flex items-start gap-4">
           <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center shrink-0">
-            <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <circle cx="7" cy="7.5" r="2.5" strokeWidth={1.5} />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 20h18M3.5 20l4.5-6.5 3.2 4L15 11l5.5 9"/>
-            </svg>
+            <span className="text-3xl" role="img" aria-label="Campo">🌾</span>
           </div>
           <div>
             <h2 className="text-white text-2xl font-bold mb-1.5">¿Buscás campos en {ciudadNombre}?</h2>
@@ -330,20 +329,20 @@ export function LocalidadClient({ ciudadNombre }: { ciudadNombre: string }) {
         </div>
       </header>
 
-      {/* HERO LOCAL — foto de la ciudad traslucida, foco en la ciudad */}
-      <section className="relative overflow-hidden border-b border-rose-100">
-        <div className="absolute inset-0 bg-gradient-to-br from-rose-500 via-rose-500 to-pink-600" />
+      {/* HERO LOCAL — foto protagonista + overlay azul noche */}
+      <section className="relative overflow-hidden border-b border-zinc-200">
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-slate-800" />
         {heroImg && (
           <img
             src={heroImg}
             alt={`Vista de ${ciudadNombre}`}
             onError={(e) => { e.currentTarget.style.display = 'none' }}
-            className="absolute inset-0 w-full h-full object-cover opacity-30"
+            className="absolute inset-0 w-full h-full object-cover"
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-rose-700/50 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-800/55 to-rose-900/30" />
         <div className="relative max-w-7xl mx-auto px-4 py-10 md:py-14">
-          <div className="flex items-center gap-2 text-sm text-rose-100 mb-5">
+          <div className="flex items-center gap-2 text-sm text-slate-200 mb-5">
             <Link href="/" className="hover:text-white transition">Inicio</Link>
             <span>/</span>
             <span className="text-white font-medium">{ciudadNombre}</span>
@@ -354,30 +353,30 @@ export function LocalidadClient({ ciudadNombre }: { ciudadNombre: string }) {
             </svg>
             Provincia de Buenos Aires
           </span>
-          <h1 className="text-white font-bold leading-tight mb-4 drop-shadow-sm">
-            <span className="block text-2xl md:text-3xl font-semibold text-rose-50">Propiedades en</span>
+          <h1 className="text-white font-bold leading-tight mb-4 drop-shadow-md">
+            <span className="block text-2xl md:text-3xl font-semibold text-slate-200">Propiedades en</span>
             <span className="block text-5xl md:text-6xl tracking-tight">{ciudadNombre}</span>
           </h1>
-          <p className="text-rose-50 text-base md:text-lg leading-relaxed mb-7 max-w-xl">
+          <p className="text-slate-100 text-base md:text-lg leading-relaxed mb-7 max-w-xl drop-shadow-sm">
             {loading
               ? `Casas, departamentos, terrenos y campos en ${ciudadNombre} y la zona.`
               : `Buscá entre ${todas.length} publicaciones de ${ciudadNombre} y la zona, sin filtros complicados.`}
           </p>
           <div className="flex flex-wrap gap-3">
-            <a href="#listado" className="bg-white text-rose-600 hover:bg-rose-50 text-sm font-semibold px-7 py-3.5 rounded-full transition shadow-md">
+            <a href="#listado" className="bg-rose-500 hover:bg-rose-600 text-white text-sm font-semibold px-7 py-3.5 rounded-full transition shadow-md">
               Ver propiedades
             </a>
-            <Link href="/soy-inmobiliaria" className="bg-white/10 border border-white/40 text-white hover:bg-white/20 text-sm font-semibold px-7 py-3.5 rounded-full transition backdrop-blur">
+            <Link href="/soy-inmobiliaria" className="bg-white/10 border border-white/50 text-white hover:bg-white/20 text-sm font-semibold px-7 py-3.5 rounded-full transition backdrop-blur">
               Soy inmobiliaria
             </Link>
           </div>
         </div>
       </section>
 
-      {/* BANNER — encontra tu propiedad + mapa (mas contraste) */}
+      {/* BANNER — encontra tu propiedad + mapa (fondo gris para contraste) */}
       <section className="bg-zinc-50">
         <div className="max-w-7xl mx-auto px-4 py-8 md:py-10">
-          <div className="rounded-3xl bg-gradient-to-br from-rose-50 via-white to-rose-50 border border-rose-100 shadow-sm p-6 md:p-9">
+          <div className="rounded-3xl bg-zinc-100 border border-zinc-200 shadow-sm p-6 md:p-9">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
               <div>
                 <h2 className="text-2xl md:text-3xl font-bold text-zinc-900 leading-tight mb-2">
