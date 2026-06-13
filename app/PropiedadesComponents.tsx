@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import FooterUrbix from '@/components/FooterUrbix'
 
 type Operacion = 'venta' | 'alquiler'
 type Orden = 'recientes' | 'precio_asc' | 'precio_desc'
@@ -394,56 +395,6 @@ function SeccionOtrasLocalidades({ ciudadNombre }: { ciudadNombre: string }) {
         </div>
       </div>
     </section>
-  )
-}
-
-function FooterUrbix() {
-  return (
-    <footer className="bg-zinc-900 text-white pt-16 pb-8 w-full">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
-          <div className="col-span-2 md:col-span-1">
-            <p className="text-2xl font-bold text-rose-400 mb-3">urbix</p>
-            <p className="text-sm text-zinc-400 leading-relaxed">El buscador inmobiliario con IA que entiende lo que buscás.</p>
-            <div className="flex gap-3 mt-4">
-              {['I', 'T', 'L'].map(s => (
-                <a key={s} href="#" className="w-8 h-8 bg-zinc-800 hover:bg-rose-500 rounded-full flex items-center justify-center transition">
-                  <span className="text-xs text-zinc-400 hover:text-white">{s}</span>
-                </a>
-              ))}
-            </div>
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-zinc-300 mb-4">Propiedades</p>
-            <ul className="space-y-2 text-sm text-zinc-500">
-              {['Casas', 'Departamentos', 'Terrenos', 'Quintas', 'Locales comerciales'].map(l => (
-                <li key={l}><a href="#" className="hover:text-rose-400 transition">{l}</a></li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-zinc-300 mb-4">Localidades</p>
-            <ul className="space-y-2 text-sm text-zinc-500">
-              {['Chivilcoy', 'Mercedes', '25 de Mayo', '9 de Julio', 'Pehuajó', 'Trenque Lauquen', 'Lobos'].map(l => (
-                <li key={l}><Link href={'/' + encodeURIComponent(l)} className="hover:text-rose-400 transition">{l}</Link></li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-zinc-300 mb-4">Empresa</p>
-            <ul className="space-y-2 text-sm text-zinc-500">
-              {['Acerca de urbix', 'Soy inmobiliaria', 'Contacto', 'Términos de uso', 'Privacidad'].map(l => (
-                <li key={l}><a href="#" className="hover:text-rose-400 transition">{l}</a></li>
-              ))}
-            </ul>
-          </div>
-        </div>
-        <div className="border-t border-zinc-800 pt-6 flex flex-col md:flex-row items-center justify-between gap-2">
-          <p className="text-xs text-zinc-600">© 2026 Urbix. Todos los derechos reservados.</p>
-          <p className="text-xs text-zinc-600">Argentina</p>
-        </div>
-      </div>
-    </footer>
   )
 }
 

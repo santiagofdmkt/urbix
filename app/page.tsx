@@ -24,69 +24,17 @@ const FOTOS_LOCALIDADES: Record<string, string> = {
   'Lobos':           'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&q=80',
 }
 
-const FOTOS_PROXIMAMENTE: Record<string, string> = {
-  'Palermo':           'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400&q=80',
-  'Belgrano':          'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?w=400&q=80',
-  'Recoleta':          'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&q=80',
-  'Caballito':         'https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=400&q=80',
-  'San Telmo':         'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&q=80',
-  'Puerto Madero':     'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&q=80',
-  'Almagro':           'https://images.unsplash.com/photo-1576941089067-2de3c901e126?w=400&q=80',
-  'Mar del Plata':     'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80',
-  'Pinamar':           'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=400&q=80',
-  'Villa Gesell':      'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&q=80',
-  'Miramar':           'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?w=400&q=80',
-  'Necochea':          'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80',
-  'Monte Hermoso':     'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&q=80',
-  'Bahía Blanca':      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400&q=80',
-  'Córdoba Capital':   'https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=400&q=80',
-  'Villa Carlos Paz':  'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&q=80',
-  'Río Cuarto':        'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=400&q=80',
-  'Alta Gracia':       'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&q=80',
-  'Villa María':       'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80',
-  'Cosquín':           'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=400&q=80',
-  'La Falda':          'https://images.unsplash.com/photo-1448375240586-882707db888b?w=400&q=80',
-  'Rosario':           'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400&q=80',
-  'Santa Fe Capital':  'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?w=400&q=80',
-  'Rafaela':           'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&q=80',
-  'Venado Tuerto':     'https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=400&q=80',
-  'Reconquista':       'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&q=80',
-  'San Lorenzo':       'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&q=80',
-  'Esperanza':         'https://images.unsplash.com/photo-1576941089067-2de3c901e126?w=400&q=80',
-  'Santa Rosa':        'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400&q=80',
-  'General Pico':      'https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=400&q=80',
-  'Toay':              'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=400&q=80',
-  'Realicó':           'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&q=80',
-  'General Acha':      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80',
-  'Eduardo Castex':    'https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=400&q=80',
-  'Victorica':         'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&q=80',
-}
+// Provincias/regiones que todavia no tienen cobertura. Se muestran como una sola
+// tarjeta "Proximamente" cada una (sin desglosar localidades), para acortar la seccion.
+const REGIONES_PROXIMAMENTE: { nombre: string; foto: string }[] = [
+  { nombre: 'Ciudad Autónoma de Buenos Aires', foto: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400&q=80' },
+  { nombre: 'Costa Atlántica',                 foto: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80' },
+  { nombre: 'Córdoba',                         foto: 'https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=400&q=80' },
+  { nombre: 'Santa Fe',                        foto: 'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?w=400&q=80' },
+  { nombre: 'La Pampa',                        foto: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400&q=80' },
+]
 
 const DEFAULT_FOTO = 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&q=80'
-
-function ProximamenteGrid({ items }: { items: string[] }) {
-  return (
-    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
-      {items.map(loc => {
-        const foto = FOTOS_PROXIMAMENTE[loc] || DEFAULT_FOTO
-        return (
-          <div key={loc} className="relative rounded-2xl overflow-hidden opacity-80 cursor-default">
-            <div className="h-28 relative">
-              <img src={foto} alt={loc} className="w-full h-full object-cover grayscale" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/20" />
-              <div className="absolute top-2 right-2 bg-zinc-700/80 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
-                Próximamente
-              </div>
-            </div>
-            <div className="absolute bottom-0 left-0 right-0 p-2">
-              <p className="text-white text-xs font-semibold leading-tight">{loc}</p>
-            </div>
-          </div>
-        )
-      })}
-    </div>
-  )
-}
 
 export default async function Home() {
   const { data: raw } = await supabase
@@ -381,13 +329,15 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* LOCALIDADES POR ZONA */}
+      {/* PROPIEDADES POR ZONA */}
       <section className="bg-zinc-50 py-12 w-full overflow-x-hidden">
         <div className="max-w-7xl mx-auto px-4">
           <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-1">Cobertura regional</p>
           <h2 className="text-2xl font-bold text-zinc-900 mb-8">Propiedades por zona</h2>
+
+          {/* Provincia de Buenos Aires (interior) — con localidades que se van cargando */}
           <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Provincia de Buenos Aires</p>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-12">
             {LOCALIDADES.map(loc => {
               const cant = conteoXCiudad[loc.nombre] || 0
               const tiene = cant > 0
@@ -408,16 +358,25 @@ export default async function Home() {
               )
             })}
           </div>
-          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Ciudad Autónoma de Buenos Aires</p>
-          <div className="mb-10"><ProximamenteGrid items={['Palermo', 'Belgrano', 'Recoleta', 'Caballito', 'San Telmo', 'Puerto Madero', 'Almagro']} /></div>
-          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Costa Atlántica</p>
-          <div className="mb-10"><ProximamenteGrid items={['Mar del Plata', 'Pinamar', 'Villa Gesell', 'Miramar', 'Necochea', 'Monte Hermoso', 'Bahía Blanca']} /></div>
-          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Córdoba</p>
-          <div className="mb-10"><ProximamenteGrid items={['Córdoba Capital', 'Villa Carlos Paz', 'Río Cuarto', 'Alta Gracia', 'Villa María', 'Cosquín', 'La Falda']} /></div>
-          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Santa Fe</p>
-          <div className="mb-10"><ProximamenteGrid items={['Rosario', 'Santa Fe Capital', 'Rafaela', 'Venado Tuerto', 'Reconquista', 'San Lorenzo', 'Esperanza']} /></div>
-          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">La Pampa</p>
-          <ProximamenteGrid items={['Santa Rosa', 'General Pico', 'Toay', 'Realicó', 'General Acha', 'Eduardo Castex', 'Victorica']} />
+
+          {/* Otras provincias y regiones — una sola tarjeta por zona, en "Proximamente" */}
+          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Otras provincias y regiones</p>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+            {REGIONES_PROXIMAMENTE.map(reg => (
+              <div key={reg.nombre} className="relative rounded-2xl overflow-hidden opacity-80 cursor-default">
+                <div className="h-28 relative">
+                  <img src={reg.foto} alt={reg.nombre} className="w-full h-full object-cover grayscale" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/20" />
+                  <div className="absolute top-2 right-2 bg-zinc-700/80 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                    Próximamente
+                  </div>
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 p-2">
+                  <p className="text-white text-xs font-semibold leading-tight">{reg.nombre}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

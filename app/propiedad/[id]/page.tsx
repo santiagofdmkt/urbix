@@ -4,6 +4,51 @@ import Link from "next/link"
 import GaleriaConLightbox from "./GaleriaConLightbox"
 import FormularioContacto from "./FormularioContacto"
 import BotonFavorito from "./BotonFavorito"
+import FooterUrbix from "@/components/FooterUrbix"
+
+// Reescribe la descripcion con la API de Claude para no republicar el texto
+// scrapeado palabra por palabra. Mantiene la misma informacion pero cambia la
+// redaccion. Si no hay API key configurada, devuelve el texto original tal cual
+// (no hace ninguna llamada, asi nunca rompe ni genera costo inesperado).
+async function reescribirDescripcion(original: string): Promise<string> {
+  const apiKey = process.env.ANTHROPIC_API_KEY
+  const texto = (original || '').trim()
+  if (!apiKey || texto.length < 40) return texto
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 2000,
+        messages: [
+          {
+            role: 'user',
+            content:
+              'Reescribí la siguiente descripción de una propiedad inmobiliaria en español rioplatense neutral. ' +
+              'Mantené EXACTAMENTE la misma información fáctica (ambientes, metros, cantidad de dormitorios y baños, ' +
+              'características, ubicación), pero cambiá la redacción, el orden de las ideas y el vocabulario para que ' +
+              'NO sea idéntica al texto original. No inventes datos que no estén en el texto. No incluyas precio, ' +
+              'títulos ni comentarios. Devolvé únicamente la descripción reescrita, respetando los saltos de párrafo.\n\n' +
+              'Texto original:\n' + texto,
+          },
+        ],
+      }),
+    })
+    if (!res.ok) return texto
+    const data = await res.json()
+    const out = Array.isArray(data?.content)
+      ? data.content.filter((b: any) => b?.type === 'text').map((b: any) => b.text).join('\n').trim()
+      : ''
+    return out || texto
+  } catch {
+    return texto
+  }
+}
 
 export default async function PropiedadDetalle({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -49,7 +94,7 @@ export default async function PropiedadDetalle({ params }: { params: Promise<{ i
     return t.length > 80 ? t.slice(0, 80).trim() + '...' : t
   })()
 
-  const descripcion = p.descripcion || p.titulo || ''
+  const descripcionOriginal = p.descripcion || p.titulo || ''
 
   const TAGS: Record<string, string> = {
     'jardin': '🌳 Jardín', 'jardín': '🌳 Jardín',
@@ -65,10 +110,24 @@ export default async function PropiedadDetalle({ params }: { params: Promise<{ i
   }
 
   const tags: string[] = []
-  const descLower = descripcion.toLowerCase()
+  const descLower = descripcionOriginal.toLowerCase()
   for (const [key, label] of Object.entries(TAGS)) {
     if (descLower.includes(key) && !tags.includes(label)) tags.push(label)
   }
+
+  // Descripcion mostrada: usa la version reescrita cacheada en la columna
+  // descripcion_reescrita; si no existe, la genera con la API y la cachea.
+  // Si no hay API key, queda la original (sin llamadas ni costo).
+  let descripcion = (p.descripcion_reescrita || '').trim()
+  if (!descripcion) {
+    descripcion = await reescribirDescripcion(descripcionOriginal)
+    if (process.env.ANTHROPIC_API_KEY && descripcion && descripcion !== descripcionOriginal) {
+      try {
+        await supabase.from('propiedades').update({ descripcion_reescrita: descripcion }).eq('id', id)
+      } catch {}
+    }
+  }
+  if (!descripcion) descripcion = descripcionOriginal
 
   const telefonoLimpio = p.contacto ? p.contacto.replace(/\D/g, '') : ''
   const waMensaje = encodeURIComponent('Hola, vi la propiedad en Urbix: ' + tituloCorto)
@@ -86,12 +145,6 @@ export default async function PropiedadDetalle({ params }: { params: Promise<{ i
       svg: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z"/> },
   ].filter(i => i.value)
 
-  const fuenteLabel: Record<string, string> = {
-    zonaprop: 'ZonaProp',
-    argenprop: 'ArgenProp',
-    mercadolibre: 'Mercado Libre',
-  }
-  const fuente = fuenteLabel[p.fuente] || p.fuente || 'portal inmobiliario'
   const nombreInmobiliaria = p.inmobiliaria || null
 
   return (
@@ -204,13 +257,19 @@ export default async function PropiedadDetalle({ params }: { params: Promise<{ i
               </div>
               <div className="bg-rose-50 px-6 py-4 space-y-3">
                 <p className="text-xs text-zinc-500 leading-relaxed">
-                  <span className="font-semibold text-zinc-600">Información sobre los datos:</span> Los derechos de los datos de esta propiedad pertenecen a la inmobiliaria correspondiente. Urbix utiliza múltiples fuentes de portales inmobiliarios como ZonaProp, ArgenProp, Mercado Libre y otros para indexar y mostrar propiedades disponibles en Argentina. Esta información se presenta únicamente con fines informativos y de búsqueda.
+                  <span className="font-semibold text-zinc-600">Información sobre los datos:</span> Los derechos de los datos de esta propiedad pertenecen a la inmobiliaria correspondiente. Urbix recopila información de distintas fuentes y portales online para indexar y mostrar propiedades disponibles en Argentina. Esta información se presenta únicamente con fines informativos y de búsqueda.
                 </p>
                 <Link
                   href="/soy-inmobiliaria?registro=1"
                   className="inline-block w-full text-center text-xs font-semibold bg-white border border-rose-200 text-rose-500 hover:bg-rose-500 hover:text-white py-2.5 px-4 rounded-xl transition">
                   Soy el dueño de esta inmobiliaria y quiero reclamar mi perfil
                 </Link>
+                <p className="text-[11px] text-zinc-400 text-center leading-relaxed pt-1">
+                  ¿Representás a esta inmobiliaria y preferís no aparecer en Urbix?{' '}
+                  <Link href="/soy-inmobiliaria?baja=1" className="text-rose-500 font-semibold hover:underline">
+                    Solicitá la baja de tus propiedades
+                  </Link>
+                </p>
               </div>
             </div>
 
@@ -239,14 +298,14 @@ export default async function PropiedadDetalle({ params }: { params: Promise<{ i
           </div>
         </div>
 
-        {/* PROPIEDADES SIMILARES */}
+        {/* OTRAS PROPIEDADES SIMILARES */}
         {similares && similares.length > 0 && (
           <div className="mt-12">
             <div className="flex items-center gap-2 mb-5">
               <svg className="w-4 h-4 text-rose-400" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/>
               </svg>
-              <h2 className="text-lg font-bold text-zinc-900">Más propiedades en {p.ciudad}</h2>
+              <h2 className="text-lg font-bold text-zinc-900">Otras propiedades similares en {p.ciudad}</h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {similares.map(s => {
@@ -272,6 +331,8 @@ export default async function PropiedadDetalle({ params }: { params: Promise<{ i
         )}
 
       </div>
+
+      <FooterUrbix />
     </div>
   )
 }
