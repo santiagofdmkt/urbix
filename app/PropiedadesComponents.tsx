@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
 type Operacion = 'venta' | 'alquiler'
+type Orden = 'recientes' | 'precio_asc' | 'precio_desc'
 
 interface Propiedad {
   id: number
@@ -24,10 +25,26 @@ interface Propiedad {
 
 const LIMITE_VISIBLE = 24
 
+const CIUDADES = ['Chivilcoy', 'Mercedes', '25 de Mayo', '9 de Julio', 'Pehuajó', 'Trenque Lauquen', 'Lobos']
+
 // Foto de cada ciudad para el hero. Dejá la imagen en /public/localidades/<ciudad>.jpg
-// Si no existe, el hero queda con el fondo azul noche igual (no rompe nada).
+// Si no existe, el hero queda con el degradado rose igual (no rompe nada).
 const IMAGENES_CIUDAD: Record<string, string> = {
   'Chivilcoy': '/localidades/chivilcoy.jpg',
+}
+
+// Tarjetas de localidades (mismo estilo que la home). Mantené imagenes y conteos
+// en sync con la home (app/page.tsx). Imagenes en /public/localidades/<archivo>.
+// props = numero de propiedades (muestra "X prop." y la hace clickeable);
+// props = null => se muestra como "Proximamente".
+const LOCALIDADES_CARDS: Record<string, { img: string; props: number | null }> = {
+  'Chivilcoy':       { img: '/localidades/chivilcoy.jpg',       props: 120 },
+  'Mercedes':        { img: '/localidades/mercedes.jpg',        props: 286 },
+  '25 de Mayo':      { img: '/localidades/25-de-mayo.jpg',      props: null },
+  '9 de Julio':      { img: '/localidades/9-de-julio.jpg',      props: null },
+  'Pehuajó':         { img: '/localidades/pehuajo.jpg',         props: null },
+  'Trenque Lauquen': { img: '/localidades/trenque-lauquen.jpg', props: null },
+  'Lobos':           { img: '/localidades/lobos.jpg',           props: 271 },
 }
 
 function parseImg(raw: any): string | null {
@@ -85,18 +102,21 @@ const RANGOS = [
   { label: 'Más de USD 350k', min: 350000, max: Infinity },
 ]
 
-function Filtros({ operacion, onCambiarOperacion, cantVenta, cantAlquiler, preciosActivos, onTogglePrecio, loading }: {
+function Filtros({ operacion, onCambiarOperacion, cantVenta, cantAlquiler, preciosActivos, onTogglePrecio, orden, onCambiarOrden, loading }: {
   operacion: Operacion
   onCambiarOperacion: (op: Operacion) => void
   cantVenta: number
   cantAlquiler: number
   preciosActivos: string[]
   onTogglePrecio: (rango: string) => void
+  orden: Orden
+  onCambiarOrden: (o: Orden) => void
   loading: boolean
 }) {
   return (
     <div className="flex flex-col gap-3 mb-8">
-      <div className="flex items-center bg-white border border-zinc-200 rounded-full p-1 shadow-sm self-start">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center bg-white border border-zinc-200 rounded-full p-1 shadow-sm">
         <button
           onClick={() => onCambiarOperacion('venta')}
           className={`cursor-pointer flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${operacion === 'venta' ? 'bg-rose-500 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-800'}`}
@@ -115,6 +135,23 @@ function Filtros({ operacion, onCambiarOperacion, cantVenta, cantAlquiler, preci
             <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${operacion === 'alquiler' ? 'bg-blue-400 text-white' : 'bg-zinc-100 text-zinc-500'}`}>{cantAlquiler}</span>
           )}
         </button>
+        </div>
+        <div className="flex items-center gap-2">
+          <label htmlFor="orden" className="text-xs text-zinc-400 hidden sm:block">Ordenar por</label>
+          <div className="relative">
+            <select
+              id="orden"
+              value={orden}
+              onChange={e => onCambiarOrden(e.target.value as Orden)}
+              className="cursor-pointer appearance-none bg-white border border-zinc-200 rounded-full pl-4 pr-9 py-2 text-sm font-semibold text-zinc-600 shadow-sm hover:border-rose-300 focus:outline-none focus:border-rose-400 transition"
+            >
+              <option value="recientes">Últimas ingresadas</option>
+              <option value="precio_asc">Menor precio</option>
+              <option value="precio_desc">Mayor precio</option>
+            </select>
+            <svg className="w-4 h-4 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/></svg>
+          </div>
+        </div>
       </div>
       <div className="flex flex-wrap gap-2">
         {RANGOS.map(r => {
@@ -174,6 +211,12 @@ function filtrarPorPrecios(props: Propiedad[], preciosActivos: string[]): Propie
   })
 }
 
+function ordenarPropiedades(props: Propiedad[], orden: Orden): Propiedad[] {
+  if (orden === 'precio_asc')  return [...props].sort((a, b) => (a.precio ?? Infinity) - (b.precio ?? Infinity))
+  if (orden === 'precio_desc') return [...props].sort((a, b) => (b.precio ?? -Infinity) - (a.precio ?? -Infinity))
+  return props
+}
+
 function BotonVerMas({ restantes, onClick }: { restantes: number; onClick: () => void }) {
   return (
     <div className="flex flex-col items-center mt-12 gap-3">
@@ -191,7 +234,7 @@ function BotonVerMas({ restantes, onClick }: { restantes: number; onClick: () =>
 
 function SeccionCampos({ ciudadNombre }: { ciudadNombre: string }) {
   return (
-    <section className="max-w-7xl mx-auto px-4 pb-14">
+    <section id="campos" className="max-w-7xl mx-auto px-4 pb-14 scroll-mt-20">
       <div className="relative overflow-hidden rounded-3xl shadow-xl">
         {/* gradiente base */}
         <div className="absolute inset-0 bg-gradient-to-r from-rose-600 via-rose-500 to-pink-600" />
@@ -233,6 +276,75 @@ function SeccionCampos({ ciudadNombre }: { ciudadNombre: string }) {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7"/></svg>
             </Link>
           </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function SeccionOtrasLocalidades({ ciudadNombre }: { ciudadNombre: string }) {
+  const otras = CIUDADES.filter(c => c !== ciudadNombre)
+  return (
+    <section className="max-w-7xl mx-auto px-4 pb-16">
+      <p className="text-xs font-bold uppercase tracking-widest text-rose-500 mb-2">Más cobertura</p>
+      <h2 className="text-2xl md:text-3xl font-bold text-zinc-900 mb-2">Explorá otras localidades</h2>
+      <p className="text-zinc-500 text-sm mb-7 max-w-xl">Sumamos propiedades del interior bonaerense. Elegí otra ciudad para ver lo que hay disponible.</p>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {otras.map(c => {
+          const info = LOCALIDADES_CARDS[c] || { img: '', props: null }
+          const activa = info.props != null
+          const inner = (
+            <>
+              <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900" />
+              {info.img && (
+                <img
+                  src={info.img}
+                  alt={c}
+                  data-tried="0"
+                  onError={(e) => {
+                    const el = e.currentTarget
+                    if (el.getAttribute('data-tried') === '0') {
+                      el.setAttribute('data-tried', '1')
+                      el.src = info.img.replace('/localidades', '')
+                    } else {
+                      el.style.display = 'none'
+                    }
+                  }}
+                  className={`absolute inset-0 w-full h-full object-cover transition duration-500 ${activa ? 'group-hover:scale-105' : ''}`}
+                />
+              )}
+              {!activa && <div className="absolute inset-0 bg-white/40" />}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+              {activa && (
+                <span className="absolute top-3 right-3 bg-rose-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow">{info.props} prop.</span>
+              )}
+              <div className="absolute bottom-0 left-0 p-4">
+                <p className="text-white font-bold text-lg leading-tight drop-shadow">{c}</p>
+                {activa ? (
+                  <p className="text-white/85 text-xs font-medium mt-0.5 inline-flex items-center gap-1">Ver propiedades <span className="group-hover:translate-x-0.5 transition">→</span></p>
+                ) : (
+                  <p className="text-white/80 text-xs font-medium mt-0.5">Próximamente</p>
+                )}
+              </div>
+            </>
+          )
+          return activa ? (
+            <Link key={c} href={'/' + encodeURIComponent(c)} className="group relative block overflow-hidden rounded-2xl h-44 md:h-48 shadow-sm hover:shadow-lg transition">
+              {inner}
+            </Link>
+          ) : (
+            <div key={c} className="relative overflow-hidden rounded-2xl h-44 md:h-48 shadow-sm">
+              {inner}
+            </div>
+          )
+        })}
+
+        {/* tarjeta: ¿tu ciudad no esta? */}
+        <div className="relative overflow-hidden rounded-2xl h-44 md:h-48 bg-rose-500 flex flex-col items-center justify-center text-center px-5">
+          <svg className="w-7 h-7 text-white mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 7a4 4 0 11-8 0 4 4 0 018 0zM11 11v9m-2-2h4"/></svg>
+          <p className="text-white font-bold text-base leading-tight">¿Tu ciudad no está?</p>
+          <p className="text-rose-100 text-xs mt-1 mb-3 leading-snug">Estamos expandiéndonos. Avisanos y la sumamos.</p>
+          <Link href="/contacto" className="bg-white text-rose-600 text-xs font-bold px-4 py-2 rounded-full hover:bg-rose-50 transition">Sugerir ciudad</Link>
         </div>
       </div>
     </section>
@@ -298,6 +410,7 @@ export function LocalidadClient({ ciudadNombre }: { ciudadNombre: string }) {
   const [loading, setLoading] = useState(true)
   const [preciosActivos, setPreciosActivos] = useState<string[]>([])
   const [mostrarTodas, setMostrarTodas] = useState(false)
+  const [orden, setOrden] = useState<Orden>('recientes')
   const [query, setQuery] = useState('')
 
   const heroImg = IMAGENES_CIUDAD[ciudadNombre]
@@ -344,8 +457,9 @@ export function LocalidadClient({ ciudadNombre }: { ciudadNombre: string }) {
 
   const porOperacion = todas.filter(p => p.operacion === operacion)
   const filtradas = filtrarPorPrecios(porOperacion, preciosActivos)
-  const visibles = mostrarTodas ? filtradas : filtradas.slice(0, LIMITE_VISIBLE)
-  const restantes = filtradas.length - LIMITE_VISIBLE
+  const ordenadas = ordenarPropiedades(filtradas, orden)
+  const visibles = mostrarTodas ? ordenadas : ordenadas.slice(0, LIMITE_VISIBLE)
+  const restantes = ordenadas.length - LIMITE_VISIBLE
   const cantVenta = todas.filter(p => p.operacion === 'venta').length
   const cantAlquiler = todas.filter(p => p.operacion === 'alquiler').length
 
@@ -356,6 +470,7 @@ export function LocalidadClient({ ciudadNombre }: { ciudadNombre: string }) {
           <Link href="/" className="text-2xl font-bold text-rose-500 tracking-tight">urbix</Link>
           <nav className="hidden md:flex items-center gap-6 text-sm">
             <Link href="/soy-inmobiliaria" className="text-zinc-500 hover:text-zinc-800 transition font-medium">Soy inmobiliaria</Link>
+            <a href="#campos" className="text-zinc-500 hover:text-zinc-800 transition font-medium">Campos en {ciudadNombre}</a>
           </nav>
           <div className="flex items-center gap-3">
             <Link href="/login" className="text-sm text-zinc-600 hover:text-zinc-900 transition font-medium">Iniciar sesión</Link>
@@ -364,7 +479,7 @@ export function LocalidadClient({ ciudadNombre }: { ciudadNombre: string }) {
         </div>
       </header>
 
-      {/* HERO LOCAL — foto protagonista + overlay azul noche */}
+      {/* HERO LOCAL — foto + texto + mapa de la ciudad */}
       <section className="relative overflow-hidden border-b border-zinc-200">
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-slate-800" />
         {heroImg && (
@@ -375,69 +490,47 @@ export function LocalidadClient({ ciudadNombre }: { ciudadNombre: string }) {
             className="absolute inset-0 w-full h-full object-cover"
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-800/55 to-rose-900/30" />
-        <div className="relative max-w-7xl mx-auto px-4 py-10 md:py-14">
-          <div className="flex items-center gap-2 text-sm text-slate-200 mb-5">
-            <Link href="/" className="hover:text-white transition">Inicio</Link>
-            <span>/</span>
-            <span className="text-white font-medium">{ciudadNombre}</span>
-          </div>
-          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-white/15 backdrop-blur px-3 py-1 rounded-full mb-5">
-            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/>
-            </svg>
-            Provincia de Buenos Aires
-          </span>
-          <h1 className="text-white font-bold leading-tight mb-4 drop-shadow-md">
-            <span className="block text-2xl md:text-3xl font-semibold text-slate-200">Propiedades en</span>
-            <span className="block text-5xl md:text-6xl tracking-tight">{ciudadNombre}</span>
-          </h1>
-          <p className="text-slate-100 text-base md:text-lg leading-relaxed mb-7 max-w-xl drop-shadow-sm">
-            Casas, departamentos, terrenos y campos en {ciudadNombre} y la zona. Encontralos sin filtros complicados.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <a href="#listado" className="bg-rose-500 hover:bg-rose-600 text-white text-sm font-semibold px-7 py-3.5 rounded-full transition shadow-md">
-              Ver propiedades
-            </a>
-            <Link href="/soy-inmobiliaria" className="bg-white/10 border border-white/50 text-white hover:bg-white/20 text-sm font-semibold px-7 py-3.5 rounded-full transition backdrop-blur">
-              Soy inmobiliaria
-            </Link>
-          </div>
-        </div>
-      </section>
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/92 via-slate-900/70 to-slate-900/45" />
+        <div className="relative max-w-7xl mx-auto px-4 py-12 md:py-16">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
 
-      {/* BANNER — encontra tu propiedad + mapa (fondo gris para contraste) */}
-      <section className="bg-zinc-50">
-        <div className="max-w-7xl mx-auto px-4 py-8 md:py-10">
-          <div className="rounded-3xl bg-zinc-100 border border-zinc-200 shadow-sm p-6 md:p-9">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-              <div>
-                <h2 className="text-2xl md:text-3xl font-bold text-zinc-900 leading-tight mb-2">
-                  Encontrá ahora la propiedad que buscás en <span className="text-rose-500">{ciudadNombre}</span>
-                </h2>
-                <p className="text-zinc-500 text-sm leading-relaxed mb-5 max-w-md">
-                  Reunimos las propiedades de toda la ciudad y la zona en un solo lugar, actualizadas de forma permanente.
-                </p>
-                <div className="flex flex-wrap gap-2.5">
-                  <div className="flex items-center gap-2.5 bg-white border border-rose-100 rounded-xl px-3.5 py-2 shadow-sm">
-                    <span className="text-xl font-bold text-rose-500 leading-none tabular-nums inline-block min-w-[2.5ch] text-center">{loading ? '—' : todas.length}</span>
-                    <span className="text-[11px] text-zinc-500 leading-tight">propiedades<br/>activas</span>
-                  </div>
-                  <div className="flex items-center gap-2 bg-white border border-rose-100 rounded-xl px-3.5 py-2 shadow-sm">
-                    <svg className="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    <span className="text-[11px] text-zinc-500 leading-tight">Cobertura<br/>local real</span>
-                  </div>
-                  <div className="flex items-center gap-2 bg-white border border-rose-100 rounded-xl px-3.5 py-2 shadow-sm">
-                    <svg className="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 4v5h5M20 20v-5h-5M5.5 9a7 7 0 0111.9-2.5M18.5 15a7 7 0 01-11.9 2.5"/></svg>
-                    <span className="text-[11px] text-zinc-500 leading-tight">Actualizado<br/>hoy</span>
-                  </div>
-                  <div className="flex items-center gap-2 bg-white border border-rose-100 rounded-xl px-3.5 py-2 shadow-sm">
-                    <svg className="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581a2.25 2.25 0 003.182 0l4.318-4.318a2.25 2.25 0 000-3.182L11.16 3.66A2.25 2.25 0 009.568 3z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 6h.008v.008H6V6z"/></svg>
-                    <span className="text-[11px] text-zinc-500 leading-tight">Venta y<br/>alquiler</span>
-                  </div>
-                </div>
+            {/* IZQUIERDA: texto */}
+            <div>
+              <div className="flex items-center gap-2 text-sm text-slate-200 mb-5">
+                <Link href="/" className="hover:text-white transition">Inicio</Link>
+                <span>/</span>
+                <span className="text-white font-medium">{ciudadNombre}</span>
               </div>
-              <div className="bg-white rounded-2xl p-2 ring-1 ring-rose-200 shadow-lg">
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-white/15 backdrop-blur px-3 py-1 rounded-full mb-5">
+                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/>
+                </svg>
+                Provincia de Buenos Aires
+              </span>
+              <h1 className="text-white font-bold leading-tight mb-4 drop-shadow-md">
+                <span className="block text-2xl md:text-3xl font-semibold text-slate-200">Propiedades en</span>
+                <span className="block text-5xl md:text-6xl tracking-tight">{ciudadNombre}</span>
+              </h1>
+              <p className="text-slate-100 text-base md:text-lg leading-relaxed mb-7 max-w-xl drop-shadow-sm">
+                Casas, departamentos, terrenos y campos en {ciudadNombre} y la zona. Encontralos sin filtros complicados.
+              </p>
+              <div className="flex flex-wrap gap-3 mb-7">
+                <a href="#listado" className="bg-rose-500 hover:bg-rose-600 text-white text-sm font-semibold px-7 py-3.5 rounded-full transition shadow-md">
+                  Ver propiedades
+                </a>
+                <Link href="/soy-inmobiliaria" className="bg-white/10 border border-white/50 text-white hover:bg-white/20 text-sm font-semibold px-7 py-3.5 rounded-full transition backdrop-blur">
+                  Soy inmobiliaria
+                </Link>
+              </div>
+              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur border border-white/20 rounded-full px-4 py-2">
+                <span className="text-base font-bold text-white tabular-nums inline-block min-w-[2.5ch] text-center">{loading ? '—' : todas.length}</span>
+                <span className="text-xs text-slate-200">propiedades activas en {ciudadNombre}</span>
+              </div>
+            </div>
+
+            {/* DERECHA: mapa (oculto en mobile) */}
+            <div className="hidden lg:block">
+              <div className="bg-white rounded-2xl p-2 ring-1 ring-white/30 shadow-2xl">
                 <div className="flex items-center justify-between px-2 py-1.5">
                   <span className="text-xs font-semibold text-zinc-700 flex items-center gap-1.5">
                     <svg className="w-3.5 h-3.5 text-rose-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/></svg>
@@ -445,10 +538,10 @@ export function LocalidadClient({ ciudadNombre }: { ciudadNombre: string }) {
                   </span>
                   <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Mapa</span>
                 </div>
-                <div className="relative rounded-xl overflow-hidden h-56 lg:h-64 bg-zinc-100">
+                <div className="relative rounded-xl overflow-hidden h-72 bg-zinc-100">
                   <iframe
                     title={`Mapa de ${ciudadNombre}`}
-                    src={`https://www.google.com/maps?q=${encodeURIComponent(ciudadNombre + ', Buenos Aires, Argentina')}&z=13&output=embed`}
+                    src={`https://www.google.com/maps?q=${encodeURIComponent(ciudadNombre + ', Buenos Aires, Argentina')}&z=13&t=h&output=embed`}
                     className="w-full h-full border-0"
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
@@ -456,41 +549,51 @@ export function LocalidadClient({ ciudadNombre }: { ciudadNombre: string }) {
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </section>
 
-      {/* BUSCADOR — estilo home, busqueda enfocada en la ciudad */}
-      <section className="bg-gradient-to-b from-rose-50 to-zinc-50 border-y border-rose-100">
+      {/* BUSCADOR — busqueda con IA, compacto */}
+      <section id="buscador" className="bg-white border-b border-zinc-100 scroll-mt-20">
         <div className="max-w-3xl mx-auto px-4 py-10 md:py-12">
-          <h2 className="text-center text-xl md:text-2xl font-bold text-zinc-700 leading-snug mb-6">
-            Describí lo que buscás en {ciudadNombre} con tus palabras.{' '}
-            <span className="text-zinc-400">Sin filtros complicados.</span>
-          </h2>
-          <div className="bg-white rounded-2xl shadow-lg px-3 py-2.5 flex items-center gap-2 mb-4">
-            <svg className="w-4 h-4 text-zinc-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-            </svg>
+          <div className="text-center mb-6">
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-rose-500 mb-2">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M5 2l1.2 3L9 6 6.2 7 5 10 3.8 7 1 6l2.8-1L5 2zm9 3l.8 2.2L17 8l-2.2.8L14 11l-.8-2.2L11 8l2.2-.8L14 5zm-3.5 6l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1L7.5 14l2.1-.9.9-2.1z"/></svg>
+              Búsqueda con IA
+            </span>
+            <h2 className="text-xl md:text-2xl font-bold text-zinc-900 leading-tight">
+              Describí lo que buscás en {ciudadNombre}
+            </h2>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-lg ring-1 ring-zinc-100 p-2 flex items-center gap-2 mb-4">
+            <span className="pl-3 text-zinc-400 shrink-0">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </span>
             <input
               type="text"
               value={query}
               onChange={e => setQuery(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') buscar() }}
-              placeholder="Ej: casa con jardín, 3 dormitorios..."
-              className="flex-1 min-w-0 text-sm text-zinc-800 outline-none bg-transparent placeholder-zinc-400"
+              placeholder="Ej: casa con jardín, 3 dormitorios y patio..."
+              className="flex-1 min-w-0 text-base text-zinc-800 outline-none bg-transparent placeholder-zinc-400 py-2"
             />
             <button
               onClick={buscar}
-              className="cursor-pointer bg-rose-500 hover:bg-rose-600 text-white text-sm font-semibold px-5 py-2 rounded-xl transition shrink-0">
+              className="cursor-pointer bg-rose-500 hover:bg-rose-600 text-white text-sm font-semibold px-6 py-3 rounded-xl transition shrink-0 inline-flex items-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
               Buscar
             </button>
           </div>
-          <div className="flex flex-wrap justify-center gap-2">
+
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <span className="text-xs text-zinc-400 mr-1">Sugerencias:</span>
             {['Casas', 'Departamentos', 'Terrenos', 'Quintas', 'Locales'].map(f => (
               <button
                 key={f}
                 onClick={() => buscarTag(f)}
-                className="cursor-pointer text-xs px-3.5 py-1.5 rounded-full border border-zinc-200 bg-white text-zinc-600 hover:border-rose-400 hover:text-rose-500 transition">
+                className="cursor-pointer text-xs font-medium px-3.5 py-1.5 rounded-full border border-zinc-200 bg-white text-zinc-600 hover:border-rose-400 hover:text-rose-500 hover:bg-rose-50 transition">
                 {f}
               </button>
             ))}
@@ -500,7 +603,8 @@ export function LocalidadClient({ ciudadNombre }: { ciudadNombre: string }) {
 
       <div id="listado" className="max-w-7xl mx-auto px-4 py-10 scroll-mt-20">
         <div className="mb-6">
-          <p className="text-zinc-400 text-sm">{loading ? 'Cargando propiedades...' : `${filtradas.length} propiedades en ${operacion}`}</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-zinc-900 mb-1">Mirá las propiedades de {ciudadNombre}</h2>
+          <p className="text-zinc-400 text-sm">{loading ? 'Cargando propiedades...' : `${filtradas.length} propiedades en ${operacion === 'venta' ? 'venta' : 'alquiler'}`}</p>
         </div>
         <Filtros
           operacion={operacion}
@@ -509,6 +613,8 @@ export function LocalidadClient({ ciudadNombre }: { ciudadNombre: string }) {
           cantAlquiler={cantAlquiler}
           preciosActivos={preciosActivos}
           onTogglePrecio={togglePrecio}
+          orden={orden}
+          onCambiarOrden={(o) => { setOrden(o); setMostrarTodas(false) }}
           loading={loading}
         />
         {loading ? <Skeleton /> : filtradas.length === 0 ? (
@@ -534,12 +640,12 @@ export function LocalidadClient({ ciudadNombre }: { ciudadNombre: string }) {
 
       <SeccionCampos ciudadNombre={ciudadNombre} />
 
+      <SeccionOtrasLocalidades ciudadNombre={ciudadNombre} />
+
       <FooterUrbix />
     </div>
   )
 }
-
-const CIUDADES = ['Chivilcoy', 'Mercedes', '25 de Mayo', '9 de Julio', 'Pehuajó', 'Trenque Lauquen', 'Lobos']
 
 export function PropiedadesClient() {
   const router = useRouter()
@@ -550,6 +656,7 @@ export function PropiedadesClient() {
   const [loading, setLoading] = useState(true)
   const [preciosActivos, setPreciosActivos] = useState<string[]>([])
   const [mostrarTodas, setMostrarTodas] = useState(false)
+  const [orden, setOrden] = useState<Orden>('recientes')
 
   useEffect(() => {
     async function fetchProps() {
@@ -582,8 +689,9 @@ export function PropiedadesClient() {
 
   const porOperacion = todas.filter(p => p.operacion === operacion)
   const filtradas = filtrarPorPrecios(porOperacion, preciosActivos)
-  const visibles = mostrarTodas ? filtradas : filtradas.slice(0, LIMITE_VISIBLE)
-  const restantes = filtradas.length - LIMITE_VISIBLE
+  const ordenadas = ordenarPropiedades(filtradas, orden)
+  const visibles = mostrarTodas ? ordenadas : ordenadas.slice(0, LIMITE_VISIBLE)
+  const restantes = ordenadas.length - LIMITE_VISIBLE
   const cantVenta = todas.filter(p => p.operacion === 'venta').length
   const cantAlquiler = todas.filter(p => p.operacion === 'alquiler').length
 
@@ -618,6 +726,8 @@ export function PropiedadesClient() {
           cantAlquiler={cantAlquiler}
           preciosActivos={preciosActivos}
           onTogglePrecio={togglePrecio}
+          orden={orden}
+          onCambiarOrden={(o) => { setOrden(o); setMostrarTodas(false) }}
           loading={loading}
         />
         <div className="flex flex-wrap gap-2 mb-8">
