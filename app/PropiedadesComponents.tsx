@@ -238,13 +238,22 @@ function SeccionCampos({ ciudadNombre }: { ciudadNombre: string }) {
       <div className="relative overflow-hidden rounded-3xl shadow-xl">
         {/* gradiente base */}
         <div className="absolute inset-0 bg-gradient-to-r from-rose-600 via-rose-500 to-pink-600" />
-        {/* foto de campo traslucida — dejá la imagen en /public/campo.jpg */}
+        {/* foto de campo translucida — /public/localidades/campo-fondo.jpg (fallback a la raiz) */}
         <img
-          src="/campo.jpg"
+          src="/localidades/campo-fondo.jpg"
           alt=""
           aria-hidden="true"
-          onError={(e) => { e.currentTarget.style.display = 'none' }}
-          className="absolute inset-0 w-full h-full object-cover opacity-25"
+          data-tried="0"
+          onError={(e) => {
+            const el = e.currentTarget
+            if (el.getAttribute('data-tried') === '0') {
+              el.setAttribute('data-tried', '1')
+              el.src = '/campo-fondo.jpg'
+            } else {
+              el.style.display = 'none'
+            }
+          }}
+          className="absolute inset-0 w-full h-full object-cover opacity-30"
         />
         {/* oscurecer hacia la izquierda para que el texto se lea */}
         <div className="absolute inset-0 bg-gradient-to-r from-rose-900/70 via-rose-700/25 to-transparent" />
@@ -541,7 +550,7 @@ export function LocalidadClient({ ciudadNombre }: { ciudadNombre: string }) {
                 <div className="relative rounded-xl overflow-hidden h-72 bg-zinc-100">
                   <iframe
                     title={`Mapa de ${ciudadNombre}`}
-                    src={`https://www.google.com/maps?q=${encodeURIComponent(ciudadNombre + ', Buenos Aires, Argentina')}&z=13&t=h&output=embed`}
+                    src={`https://www.google.com/maps?q=${encodeURIComponent(ciudadNombre + ', Buenos Aires, Argentina')}&z=13&output=embed`}
                     className="w-full h-full border-0"
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
