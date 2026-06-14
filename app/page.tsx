@@ -36,22 +36,34 @@ const REGIONES_PROXIMAMENTE: { nombre: string; foto: string }[] = [
 
 const DEFAULT_FOTO = 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&q=80'
 
-// Encabezado de seccion: eyebrow espaciado arriba + titulo grande con linea editorial al costado.
-// Se ve bien en mobile y desktop. La linea se oculta en mobile para que el titulo respire.
+// Encabezado de seccion: etiqueta fina con degrade vivo (mismo tono que la barra
+// de stats) para que cada titulo levante, marcada pero prolija. El ring interno
+// tenue le da definicion sin recargarla. inline-block para que el boton "Ver mas"
+// pueda quedar pegado al lado en vez de irse al extremo derecho.
 function SectionHeading({ eyebrow, titulo, acento = 'rose' }: { eyebrow: string; titulo: string; acento?: 'rose' | 'blue' | 'emerald' }) {
-  const texto = acento === 'blue' ? 'text-blue-500' : acento === 'emerald' ? 'text-emerald-600' : 'text-rose-500'
-  const linea = acento === 'blue' ? 'bg-blue-200' : acento === 'emerald' ? 'bg-emerald-200' : 'bg-rose-200'
+  const fondo =
+    acento === 'blue'
+      ? 'linear-gradient(120deg, #2563eb 0%, #3b82f6 50%, #06b6d4 100%)'
+      : acento === 'emerald'
+      ? 'linear-gradient(120deg, #047857 0%, #10b981 55%, #34d399 100%)'
+      : 'linear-gradient(120deg, #e1108c 0%, #f43f5e 45%, #fb6f4c 100%)'
+  const sombra =
+    acento === 'blue'
+      ? '0 4px 14px -8px rgba(37,99,235,0.5)'
+      : acento === 'emerald'
+      ? '0 4px 14px -8px rgba(5,150,105,0.5)'
+      : '0 4px 14px -8px rgba(225,16,140,0.45)'
   return (
-    <div className="mb-7">
-      <p className={`text-[11px] font-bold uppercase mb-3 ${texto}`} style={{ letterSpacing: '0.28em' }}>
+    <div
+      className="inline-block rounded-lg px-3.5 py-2 ring-1 ring-inset ring-white/20"
+      style={{ background: fondo, boxShadow: sombra }}
+    >
+      <p className="text-[10px] font-semibold uppercase mb-0.5 text-white/70" style={{ letterSpacing: '0.2em' }}>
         {eyebrow}
       </p>
-      <div className="flex items-center gap-4">
-        <h2 className="text-2xl md:text-3xl font-bold text-zinc-900 tracking-tight shrink-0">
-          {titulo}
-        </h2>
-        <span className={`hidden sm:block h-px flex-1 ${linea} rounded-full`} />
-      </div>
+      <h2 className="text-lg md:text-xl font-bold text-white tracking-tight leading-tight">
+        {titulo}
+      </h2>
     </div>
   )
 }
@@ -147,7 +159,7 @@ export default async function Home() {
 
       {/* HERO */}
       <section className="relative py-12 md:py-20 px-4 text-center overflow-hidden w-full"
-        style={{ background: "linear-gradient(135deg, #fff1f2 0%, #fce7f3 50%, #ede9fe 100%)" }}>
+        style={{ background: "linear-gradient(135deg, #fdd9de 0%, #f9b9cb 45%, #e3c4ec 100%)" }}>
         <p className="text-xs font-bold tracking-widest text-rose-400 uppercase mb-4">Buscador inmobiliario con IA</p>
         <h1 className="text-4xl md:text-6xl font-bold text-zinc-900 leading-tight mb-4">
           Buscá propiedades<br />
@@ -168,7 +180,8 @@ export default async function Home() {
       </section>
 
       {/* STATS */}
-      <section className="border-b border-zinc-100 py-6 w-full overflow-x-hidden">
+      <section className="border-b border-rose-400 py-6 w-full overflow-x-hidden"
+        style={{ background: 'linear-gradient(120deg, #e1108c 0%, #f43f5e 45%, #fb6f4c 100%)' }}>
         <div className="max-w-4xl mx-auto px-4 grid grid-cols-2 md:flex md:justify-center gap-6 md:gap-16">
           {[
             { num: `${total}+`, label: "Propiedades disponibles" },
@@ -177,8 +190,8 @@ export default async function Home() {
             { num: "100%",      label: "Gratis para buscar" },
           ].map(s => (
             <div key={s.label} className="text-center">
-              <p className="text-2xl font-bold text-rose-500">{s.num}</p>
-              <p className="text-xs text-zinc-400 mt-0.5">{s.label}</p>
+              <p className="text-2xl font-extrabold text-white drop-shadow">{s.num}</p>
+              <p className="text-xs mt-0.5 text-rose-50">{s.label}</p>
             </div>
           ))}
         </div>
@@ -236,9 +249,9 @@ export default async function Home() {
 
       {/* PROPIEDADES EN VENTA */}
       <section id="comprar" className="max-w-7xl mx-auto px-4 py-10 w-full">
-        <div className="flex items-end justify-between gap-4 mb-6">
+        <div className="flex flex-wrap items-center gap-4 mb-6">
           <SectionHeading eyebrow="Nuevas y destacadas" titulo="Lo último disponible" />
-          <Link href="/propiedades?operacion=venta" className="shrink-0 inline-flex items-center gap-1.5 text-sm font-semibold text-rose-500 border border-rose-200 hover:bg-rose-500 hover:text-white px-4 py-2 rounded-full transition mb-1">
+          <Link href="/propiedades?operacion=venta" className="shrink-0 inline-flex items-center gap-1.5 text-sm font-semibold text-rose-500 border border-rose-200 hover:bg-rose-500 hover:text-white px-4 py-2 rounded-full transition">
             Ver más
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7"/></svg>
           </Link>
@@ -277,9 +290,9 @@ export default async function Home() {
       {/* PROPIEDADES EN ALQUILER */}
       <section id="alquiler" className="bg-zinc-50 w-full py-10">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-end justify-between gap-4 mb-6">
+          <div className="flex flex-wrap items-center gap-4 mb-6">
             <SectionHeading eyebrow="Disponibles ahora" titulo="Propiedades en alquiler" acento="blue" />
-            <Link href="/propiedades?operacion=alquiler" className="shrink-0 inline-flex items-center gap-1.5 text-sm font-semibold text-blue-500 border border-blue-200 hover:bg-blue-500 hover:text-white px-4 py-2 rounded-full transition mb-1">
+            <Link href="/propiedades?operacion=alquiler" className="shrink-0 inline-flex items-center gap-1.5 text-sm font-semibold text-blue-500 border border-blue-200 hover:bg-blue-500 hover:text-white px-4 py-2 rounded-full transition">
               Ver más
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7"/></svg>
             </Link>
@@ -362,8 +375,8 @@ export default async function Home() {
       {/* EXPLORÁ POR LOCALIDAD */}
       <section className="bg-gradient-to-br from-rose-50 to-white py-16 w-full">
         <div className="max-w-7xl mx-auto px-4">
-          <SectionHeading eyebrow="Dónde encontramos propiedades" titulo="Explorá por localidad" />
-          <p className="text-sm text-zinc-400 mb-8 max-w-lg">Cobertura real en el interior bonaerense. Hacé clic en tu ciudad para ver todas las propiedades disponibles.</p>
+          <SectionHeading eyebrow="Nuestras localidades" titulo="Explorá por localidad" />
+          <p className="text-sm text-zinc-400 mt-5 mb-8 max-w-lg">Cobertura real en el interior bonaerense. Hacé clic en tu ciudad para ver todas las propiedades disponibles.</p>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {LOCALIDADES.map(loc => {
               const cant = conteoXCiudad[loc.nombre] || 0
