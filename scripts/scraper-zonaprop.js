@@ -16,7 +16,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ─── CIUDAD A SCRAPEAR — cambiá solo esta línea ───────────────────────────
-const CIUDAD = { nombre: 'Mercedes', slug: 'mercedes-mercedes' };
+const CIUDAD = { nombre: '25 de Mayo', slug: '25-de-mayo-25-de-mayo' };
 // Opciones disponibles:
 // { nombre: 'Chivilcoy',       slug: 'chivilcoy-chivilcoy' }
 // { nombre: 'Mercedes',        slug: 'mercedes-mercedes' }
@@ -95,6 +95,21 @@ function limpiarInt(texto) {
   if (!texto) return null;
   const match = texto.match(/\d+/);
   return match ? parseInt(match[0]) : null;
+}
+
+// ─── FILTRO ANTI-CAMPOS ───────────────────────────────────────────────────
+// Excluye campos, chacras, quintas y fracciones rurales por palabras clave
+// en el titulo o la direccion. ZonaProp los mezcla dentro de "inmuebles".
+const PALABRAS_CAMPO = [
+  'campo', 'chacra', 'fracción', 'fraccion', 'rural',
+  'hectárea', 'hectarea', ' has', ' has.', 'estancia', 'tambo',
+  'establecimiento agropecuario', 'establecimiento rural', 'loteo rural',
+];
+
+function esCampo(texto) {
+  if (!texto) return false;
+  const t = texto.toLowerCase();
+  return PALABRAS_CAMPO.some(palabra => t.includes(palabra));
 }
 
 async function yaExiste(url) {
@@ -250,6 +265,12 @@ async function scrapearListado(page, operacion, urlBase) {
       console.log(`  📄 ${CIUDAD.nombre}/${operacion} pág ${pag}: ${items.length} props`);
 
       for (const item of items) {
+        // Saltar campos / chacras / fracciones rurales antes de procesar
+        if (esCampo(item.titulo) || esCampo(item.direccion)) {
+          process.stdout.write('🌾');
+          continue;
+        }
+
         propiedades.push({
           titulo:        item.titulo,
           precio:        limpiarPrecio(item.precioTexto),
@@ -293,7 +314,7 @@ async function main() {
     for (const { tipo, urlBase } of OPERACIONES) {
       console.log(`\n📍 ${CIUDAD.nombre} — ${tipo.toUpperCase()}`);
       const propiedades = await scrapearListado(page, tipo, urlBase);
-      console.log(`  Total encontradas: ${propiedades.length}`);
+      console.log(`  Total encontradas (sin campos): ${propiedades.length}`);
 
       for (const prop of propiedades) {
         await guardarPropiedad(prop, page, tipo);

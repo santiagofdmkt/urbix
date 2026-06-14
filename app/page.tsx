@@ -247,45 +247,6 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* PROPIEDADES EN VENTA */}
-      <section id="comprar" className="max-w-7xl mx-auto px-4 py-10 w-full">
-        <div className="flex flex-wrap items-center gap-4 mb-6">
-          <SectionHeading eyebrow="Nuevas y destacadas" titulo="Lo último disponible" />
-          <Link href="/propiedades?operacion=venta" className="shrink-0 inline-flex items-center gap-1.5 text-sm font-semibold text-rose-500 border border-rose-200 hover:bg-rose-500 hover:text-white px-4 py-2 rounded-full transition">
-            Ver más
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7"/></svg>
-          </Link>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {destacadas.map(p => {
-            const img = getImg(p.imagenes)
-            if (!img) return null
-            const titulo = getTitulo(p.titulo)
-            return (
-              <Link key={p.id} href={`/propiedad/${p.id}`} className="group block rounded-2xl overflow-hidden border border-zinc-100 hover:shadow-lg transition">
-                <div className="relative h-44 bg-zinc-100 overflow-hidden">
-                  <img src={img} alt={titulo} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
-                  <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-xs font-semibold text-rose-500 px-2 py-1 rounded-lg">
-                    {p.moneda} {p.precio?.toLocaleString('es-AR')}
-                  </div>
-                  <div className="absolute top-2 right-2 bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                    Venta
-                  </div>
-                </div>
-                <div className="p-3">
-                  <p className="text-sm font-semibold text-zinc-800 line-clamp-1">{titulo}</p>
-                  <p className="text-xs text-zinc-400 mt-0.5 line-clamp-1">{p.direccion}</p>
-                  <div className="flex gap-3 mt-2 text-xs text-zinc-500">
-                    {p.dormitorios && <span>{p.dormitorios} dorm.</span>}
-                    {p.banos && <span>{p.banos} baños</span>}
-                    {p.superficie_m2 && <span>{p.superficie_m2} m²</span>}
-                  </div>
-                </div>
-              </Link>
-            )
-          })}
-        </div>
-      </section>
 
       {/* PROPIEDADES EN ALQUILER */}
       <section id="alquiler" className="bg-zinc-50 w-full py-10">
