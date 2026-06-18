@@ -22,6 +22,7 @@ interface Propiedad {
   inmobiliaria: string | null
   operacion: string | null
   ciudad: string | null
+  aptitud: string | null
 }
 
 const LIMITE_MOBILE = 7
@@ -75,6 +76,22 @@ function parseImg(raw: any): string | null {
 function getTitulo(titulo: string | null): string {
   const t = titulo?.trim() || ''
   return t.length > 70 ? t.slice(0, 70).trim() + '...' : t
+}
+
+// Detecta si una propiedad es un campo / inmueble rural. Dos señales:
+// 1) aptitud cargada (todo lo de Agrofy la tiene)
+// 2) palabras clave en titulo/direccion (fracciones rurales de ZonaProp, que
+//    NO tienen aptitud). Misma lista que el esCampo() del scraper de ZonaProp.
+const PALABRAS_CAMPO = [
+  'campo', 'chacra', 'fracción', 'fraccion', 'rural',
+  'hectárea', 'hectarea', ' has', ' has.', 'estancia', 'tambo',
+  'establecimiento agropecuario', 'establecimiento rural', 'loteo rural',
+]
+
+function esCampoProp(p: Propiedad): boolean {
+  if (p.aptitud) return true
+  const t = `${p.titulo ?? ''} ${p.direccion ?? ''}`.toLowerCase()
+  return PALABRAS_CAMPO.some(w => t.includes(w))
 }
 
 function PropCard({ p, operacion, mostrarCiudad = false }: { p: Propiedad; operacion: Operacion; mostrarCiudad?: boolean }) {
@@ -314,7 +331,7 @@ function SeccionCampos({ ciudadNombre }: { ciudadNombre: string }) {
               </div>
             </div>
             <Link
-              href={`/${encodeURIComponent(ciudadNombre)}/campos`}
+              href={`/campos?ciudad=${encodeURIComponent(ciudadNombre)}`}
               className="shrink-0 inline-flex items-center justify-center gap-2 bg-white text-rose-600 hover:bg-rose-50 font-bold text-base px-8 py-4 rounded-full transition shadow-lg hover:-translate-y-0.5 whitespace-nowrap">
               Ver campos en {ciudadNombre}
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7"/></svg>
@@ -418,6 +435,7 @@ export function LocalidadClient({ ciudadNombre }: { ciudadNombre: string }) {
   useEffect(() => {
     async function fetchProps() {
       setLoading(true)
+      // Excluye campos (aptitud != null): esos van solo a /campos, no al listado urbano.
       const { data } = await supabase
         .from('propiedades')
         .select('*')
@@ -425,7 +443,8 @@ export function LocalidadClient({ ciudadNombre }: { ciudadNombre: string }) {
         .eq('ciudad', ciudadNombre)
         .not('imagenes', 'is', null)
         .order('created_at', { ascending: false })
-      setTodas(data || [])
+      // Filtro robusto: saca campos de Agrofy (aptitud) y fracciones rurales de ZonaProp (keywords).
+      setTodas((data || []).filter(p => !esCampoProp(p)))
       setLoading(false)
     }
     fetchProps()
@@ -663,13 +682,15 @@ export function PropiedadesClient() {
   useEffect(() => {
     async function fetchProps() {
       setLoading(true)
+      // Excluye campos (aptitud != null): esos van solo a /campos, no al listado general.
       const { data } = await supabase
         .from('propiedades')
         .select('*')
         .eq('activo', true)
         .not('imagenes', 'is', null)
         .order('created_at', { ascending: false })
-      setTodas(data || [])
+      // Filtro robusto: saca campos de Agrofy (aptitud) y fracciones rurales de ZonaProp (keywords).
+      setTodas((data || []).filter(p => !esCampoProp(p)))
       setLoading(false)
     }
     fetchProps()
@@ -720,6 +741,7 @@ export function PropiedadesClient() {
           <h1 className="text-3xl font-bold text-zinc-900 mb-1">Todas las propiedades</h1>
           <p className="text-zinc-400 text-sm">{loading ? 'Cargando...' : `${filtradas.length} propiedades en ${operacion}`}</p>
         </div>
+
         <Filtros
           operacion={operacion}
           onCambiarOperacion={cambiarOperacion}

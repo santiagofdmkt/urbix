@@ -98,6 +98,7 @@ export default async function Home() {
     .from('propiedades')
     .select('ciudad')
     .eq('activo', true)
+    .is('aptitud', null)
 
   const conteoXCiudad: Record<string, number> = {}
   for (const p of porCiudad || []) {
