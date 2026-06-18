@@ -460,7 +460,7 @@ export default function CamposClient() {
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-700 to-green-600 px-6 py-10 md:px-12 md:py-12 text-center md:text-left">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="max-w-2xl">
-              <h2 className="text-white text-2xl md:text-3xl font-bold mb-2">¿Tenés campos para vender o alquilar?</h2>
+              <h2 className="text-white text-2xl md:text-3xl font-bold mb-2">¿Sos inmobiliaria y querés publicar tus campos?</h2>
               <p className="text-emerald-50 text-sm md:text-base leading-relaxed">
                 Sumá tus campos a Urbix y llegá a compradores del interior que buscan tierra productiva. Sin comisiones, sin límites.
               </p>
