@@ -333,41 +333,6 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* EXPLORÁ POR LOCALIDAD */}
-      <section className="bg-gradient-to-br from-rose-50 to-white py-16 w-full">
-        <div className="max-w-7xl mx-auto px-4">
-          <SectionHeading eyebrow="Nuestras localidades" titulo="Explorá por localidad" />
-          <p className="text-sm text-zinc-400 mt-5 mb-8 max-w-lg">Cobertura real en el interior bonaerense. Hacé clic en tu ciudad para ver todas las propiedades disponibles.</p>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {LOCALIDADES.map(loc => {
-              const cant = conteoXCiudad[loc.nombre] || 0
-              const foto = FOTOS_LOCALIDADES[loc.nombre] || DEFAULT_FOTO
-              const tiene = cant > 0
-              return (
-                <Link key={loc.nombre} href={tiene ? '/' + encodeURIComponent(loc.nombre) : '#'}
-                  className={`group relative rounded-3xl overflow-hidden block ${tiene ? 'hover:shadow-xl' : 'opacity-50 pointer-events-none'} transition-all duration-300`}>
-                  <div className="h-48 md:h-56 relative overflow-hidden">
-                    <img src={foto} alt={loc.nombre} className="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                  </div>
-                  {tiene && <div className="absolute top-3 right-3 bg-rose-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg">{cant} prop.</div>}
-                  <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <p className="text-white font-bold text-lg leading-tight">{loc.nombre}</p>
-                    <p className="text-rose-200 text-xs mt-0.5 font-medium">{tiene ? 'Ver propiedades →' : 'Próximamente'}</p>
-                  </div>
-                </Link>
-              )
-            })}
-            <div className="relative rounded-3xl overflow-hidden bg-rose-500 flex flex-col items-center justify-center p-6 text-center min-h-[192px] md:min-h-[224px]">
-              <div className="text-4xl mb-3">📍</div>
-              <p className="text-white font-bold text-base leading-snug mb-1">¿Tu ciudad no está?</p>
-              <p className="text-rose-100 text-xs mb-4">Estamos expandiéndonos. Avisanos y la sumamos.</p>
-              <Link href="/contacto" className="bg-white text-rose-500 text-xs font-bold px-4 py-2 rounded-full hover:bg-rose-50 transition">Sugerir ciudad</Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* CAMPOS DEL INTERIOR */}
       <section id="campos" className="max-w-7xl mx-auto px-4 pb-16 pt-4 scroll-mt-20 w-full">
         <div className="relative overflow-hidden rounded-3xl shadow-xl">

@@ -27,8 +27,6 @@ interface Campo {
 const LIMITE_MOBILE = 7
 const LIMITE_DESKTOP = 24
 
-const CIUDADES = ['Chivilcoy', 'Mercedes', '25 de Mayo', '9 de Julio', 'Pehuajó', 'Trenque Lauquen', 'Lobos']
-
 function useEsMobile(): boolean {
   const [esMobile, setEsMobile] = useState(false)
   useEffect(() => {
@@ -302,11 +300,12 @@ export default function CamposClient() {
   useEffect(() => {
     async function fetchCampos() {
       setLoading(true)
+      // Un campo es toda propiedad con aptitud cargada (todo lo de Agrofy la tiene).
       const { data } = await supabase
         .from('propiedades')
         .select('*')
         .eq('activo', true)
-        .eq('tipo', 'campo')
+        .not('aptitud', 'is', null)
         .not('imagenes', 'is', null)
         .order('created_at', { ascending: false })
       setTodos(data || [])
@@ -333,8 +332,10 @@ export default function CamposClient() {
     )
   }
 
-  // Ciudades que efectivamente tienen campos cargados (para los chips de localidad)
-  const ciudadesConCampos = CIUDADES.filter(c => todos.some(p => p.ciudad === c))
+  // Chips de localidad generados desde la data real (cualquier partido con campos).
+  const ciudadesConCampos = Array.from(
+    new Set(todos.map(p => p.ciudad).filter(Boolean) as string[])
+  ).sort((a, b) => a.localeCompare(b, 'es'))
 
   const porOperacion = todos.filter(p => p.operacion === operacion)
   const porCiudad = ciudadActiva === 'Todas' ? porOperacion : porOperacion.filter(p => p.ciudad === ciudadActiva)
